@@ -3066,3 +3066,8 @@ libKF5PimTextEdit.so.5 kpimtextedit-17.12.0_1
 libKF5IdentityManagement.so.5 kidentitymanagement-17.12.0_1
 libKChart.so.2 kdiagram-2.6.0_1
 libKGantt.so.2 kdiagram-2.6.0_1
+libite.so.3 libite-1.8.2_1
+libre.so re-0.5.0_1
+libre.so re-0.5.6_1
+librem.so rem-0.5.0_1
+libspandsp.so.2 spandsp-0.0.6_1
