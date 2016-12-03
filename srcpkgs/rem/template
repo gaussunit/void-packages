@@ -1,0 +1,48 @@
+# Template file for 'rem'
+pkgname="rem"
+version="0.5.2"
+revision=1
+build_style=gnu-makefile
+makedepends="re-devel"
+short_desc="Library for real-time audio and video processing"
+maintainer="JohnZ <johnz@posteo.net>"
+license="BSD"
+homepage="http://www.creytiv.com/"
+distfiles="http://www.creytiv.com/pub/rem-${version}.tar.gz"
+checksum=fbc54e81ed4fd28a11d525f4384d06bee4c11e10975395668e8260ef0d4a64eb
+make_use_env=1
+shlib_provides="librem.so"
+CFLAGS="-I${XBPS_CROSS_BASE}/usr/include/re"
+make_build_args="EXTRA_CFLAGS=$CFLAGS EXTRA_LFLAGS=$LDFALGS RELEASE=1"
+#disable_parallel_build=1
+
+case "$XBPS_TARGET_MACHINE" in
+	armv6*) make_build_args+="HAVE_ARMV6=1 BUILD=BUILD-arm";;
+	aarch64* | armv7* ) make_build_args+="HAVE_NEON=";;
+esac
+
+case $XBPS_TARGET_MACHINE in
+	i686*) arch="i686";;
+	x86_64*) arch="x86_64";;
+	armv6*) arch="arm6";;
+	aarch64*) arch="arm64";;
+	arm*) arch="arm";;
+	mips*) arch="mips";;
+esac
+
+make_install_args+=" ARCH=$arch"
+make_build_args+=" ARCH=$arch"
+
+post_install() {
+	vlicense docs/COPYING
+}
+
+rem-devel_package() {
+	short_desc+=" - development files"
+	depends="${sourcepkg}>=${version}_${revision}"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/*.a
+		vmove usr/lib/pkgconfig
+	}
+}
