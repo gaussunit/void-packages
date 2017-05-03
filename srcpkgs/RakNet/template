@@ -1,0 +1,32 @@
+# Template file for 'RakNet'
+pkgname=RakNet
+version=4.081.1
+revision=1
+_commit="96db490e7e6bc503fa3cde56ac4fe48753a1ff30"
+wrksrc="${pkgname}-${_commit}"
+build_style=cmake
+hostmakedepends="pkg-config"
+configure_args="-DRAKNET_GENERATE_SAMPLES=0"
+short_desc="A cross platform, open source, C++ networking engine for games"
+maintainer="John <johnz@posteo.net>"
+license="BSD-2"
+homepage="https://github.com/TES3MP/RakNet"
+distfiles="${homepage}/archive/${_commit}.tar.gz"
+checksum=d2b530768b91fe23e0b11ad2bb9fd625662b3565cbea279ccbe24ee60b6f07f5
+
+do_install() {
+	vinstall build/lib/libraknet.so 755 usr/lib
+	vinstall build/lib/libRakNetLibStatic.a 755 usr/lib
+	vinstall build/lib/libraknet.so.4.081 755 usr/lib
+	mv include/ ${DESTDIR}/usr/include/
+	vlicense LICENSE
+}
+
+RakNet-devel_package() {
+	short_desc+=" - devel"
+	depends="RakNet-${version}_${revision}"
+	pkg_install() {
+		vmove usr/include/
+		vmove usr/lib/libRakNetLibStatic.a
+	}
+}

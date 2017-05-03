@@ -2989,3 +2989,5 @@ librpmsign.so.7 rpm-4.13.0.2_1
 librpmbuild.so.7 rpm-4.13.0.2_1
 librpmio.so.7 rpm-4.13.0.2_1
 libexecinfo.so.1 libexecinfo-1.1_1
+libRakNetDLL.so RakNet-4.081_1
+libraknet.so.4.081 RakNet-4.081.1_1
