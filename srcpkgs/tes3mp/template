@@ -1,0 +1,31 @@
+# Template file for 'tes3mp'
+pkgname=tes3mp
+version=0.6.1
+revision=1
+wrksrc="openmw-tes3mp-tes3mp-${version}"
+build_style=cmake
+configure_args="-DFORCE_LUA=1 -DLUA_INCLUDE_DIR=/usr/include/lua5.1
+ -DBUILD_ESMTOOL=0 -DBUILD_BSATOOL=0 -DBUILD_OPENCS=0 -DBUILD_WIZARD=0
+ -DBUILD_LAUNCHER=0 -DBUILD_ESSIMPORTER=0 -DBUILD_MWINIIMPORTER=0
+ -DUSE_SYSTEM_TINYXML=1 -DOVERWRITE_HASHES=1
+ -DOVERWRITE_COMMITHASH=da7253bb576f699a6709e1ca2ba646565b515e32
+ -DOVERWRITE_TAGHASH=f61664ff6d521e10db761a550c97c6edce8f0046"
+patch_args="-Np1"
+hostmakedepends="pkg-config"
+makedepends="RakNet-devel libXt-devel libunshield-devel libmygui-devel
+ osg-devel bullet-devel libopenal-devel SDL2-devel qt5-devel boost-devel
+ ffmpeg-devel libavformat libavutil libswscale libswresample CallFF
+ lua51-devel tinyxml-devel"
+short_desc="Multiplayer modification of openmw"
+maintainer="JohnZ <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/TES3MP/openmw-tes3mp"
+distfiles="https://github.com/TES3MP/openmw-tes3mp/archive/tes3mp-${version}.tar.gz"
+checksum=42b06c75a35d30e9c65d37121852feddc2be85020dbd6bb82651a160b5d9a16a
+
+tes3mp-server_package() {
+	short_desc+="Tes3mp Server"
+	pkg_install() {
+		vmove usr/bin/tes3mp-server
+	}
+}

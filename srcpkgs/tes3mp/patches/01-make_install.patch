@@ -1,0 +1,127 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8f6889515..821ef07c1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,18 @@ option(BUILD_NIFTEST "build nif file tester" OFF)
+ option(BUILD_MYGUI_PLUGIN "build MyGUI plugin for OpenMW resources, to use with MyGUI tools" ON)
+ option(BUILD_DOCS        "build documentation." OFF )
+ 
++#Overwrite git hashes
++option(OVERWRITE_HASHES "overwrite git commit hashes" OFF)
++
++IF( OVERWRITE_HASHES )
++    set(OVERWRITE_COMMITHASH 0 CACHE STRING "The Commit Hash tes3mp should show")
++    message(STATUS "Commit Hash ${OVERWRITE_COMMITHASH}")
++    set(OPENMW_VERSION_COMMITHASH ${OVERWRITE_COMMITHASH})
++    set(OVERWRITE_TAGHASH 0 CACHE STRING "The Tag Hash tes3mp should show")
++    message(STATUS "Tag Hash ${OVERWRITE_TAGHASH}")
++    set(OPENMW_VERSION_TAGHASH ${OVERWRITE_TAGHASH})
++ENDIF()
++
+ # what is necessary to build documentation
+ IF( BUILD_DOCS )
+     # Builds the documentation.
+@@ -102,7 +114,7 @@ elseif(UNIX)
+     SET(LIBDIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE PATH "Where to install libraries")
+     SET(DATAROOTDIR "${CMAKE_INSTALL_PREFIX}/share" CACHE PATH "Sets the root of data directories to a non-default location")
+     SET(GLOBAL_DATA_PATH "${DATAROOTDIR}/games/" CACHE PATH "Set data path prefix")
+-    SET(DATADIR "${GLOBAL_DATA_PATH}/openmw" CACHE PATH "Sets the openmw data directories to a non-default location")
++    SET(DATADIR "${GLOBAL_DATA_PATH}/tes3mp" CACHE PATH "Sets the openmw data directories to a non-default location")
+     SET(ICONDIR "${DATAROOTDIR}/pixmaps" CACHE PATH "Set icon dir")
+     SET(LICDIR "${DATAROOTDIR}/licenses/openmw" CACHE PATH "Sets the openmw license directory to a non-default location.")
+     IF("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+@@ -357,6 +369,8 @@ if (NOT WIN32 AND NOT APPLE)
+         "${OpenMW_BINARY_DIR}/openmw.desktop")
+     configure_file(${OpenMW_SOURCE_DIR}/files/openmw.appdata.xml
+         "${OpenMW_BINARY_DIR}/openmw.appdata.xml")
++    configure_file(${OpenMW_SOURCE_DIR}/files/tes3mp-browser.desktop
++	    "${OpenMW_BINARY_DIR}/tes3mp-browser.desktop")
+     configure_file(${OpenMW_SOURCE_DIR}/files/openmw-cs.desktop
+         "${OpenMW_BINARY_DIR}/openmw-cs.desktop")
+ endif()
+@@ -397,13 +411,16 @@ IF(NOT WIN32 AND NOT APPLE)
+ 
+     # Install binaries
+     IF(BUILD_OPENMW)
+-        INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/openmw" DESTINATION "${BINDIR}" )
++        INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/tes3mp" DESTINATION "${BINDIR}" )
+     ENDIF(BUILD_OPENMW)
++    IF(BUILD_OPENMW_MP)
++        INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/tes3mp-server" DESTINATION "${BINDIR}")
++    ENDIF(BUILD_OPENMW_MP)
+     IF(BUILD_LAUNCHER)
+         INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/openmw-launcher" DESTINATION "${BINDIR}" )
+     ENDIF(BUILD_LAUNCHER)
+     IF(BUILD_BROWSER)
+-        INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/openmw-browser" DESTINATION "${BINDIR}" )
++        INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/tes3mp-browser" DESTINATION "${BINDIR}" )
+     ENDIF(BUILD_BROWSER)
+     IF(BUILD_BSATOOL)
+         INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/bsatool" DESTINATION "${BINDIR}" )
+@@ -437,6 +454,9 @@ IF(NOT WIN32 AND NOT APPLE)
+     INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw.desktop" DESTINATION "${DATAROOTDIR}/applications" COMPONENT "openmw")
+     INSTALL(FILES "${OpenMW_SOURCE_DIR}/files/launcher/images/openmw.png" DESTINATION "${ICONDIR}" COMPONENT "openmw")
+     INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw.appdata.xml" DESTINATION "${DATAROOTDIR}/metainfo" COMPONENT "openmw")
++    IF(BUILD_BROWSER)
++    	INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-browser.desktop" DESTINATION "${DATAROOTDIR}/applications" COMPONENT "browser")
++    ENDIF(BUILD_BROWSER)
+     IF(BUILD_OPENCS)
+         INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw-cs.desktop" DESTINATION "${DATAROOTDIR}/applications" COMPONENT "opencs")
+         INSTALL(FILES "${OpenMW_SOURCE_DIR}/files/opencs/openmw-cs.png" DESTINATION "${ICONDIR}" COMPONENT "opencs")
+@@ -448,10 +468,11 @@ IF(NOT WIN32 AND NOT APPLE)
+     INSTALL(FILES "${OpenMW_BINARY_DIR}/resources/version" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
+     INSTALL(FILES "${OpenMW_BINARY_DIR}/gamecontrollerdb.txt" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
+ 
+-    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-client-default" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
+-    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-client.install" DESTINATION "${SYSCONFDIR}" RENAME "tes3mp-client.cfg" COMPONENT "openmw")
+-    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-server-default" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw-mp")
+-    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-server.install" DESTINATION "${SYSCONFDIR}" RENAME "tes3mp-server.cfg" COMPONENT "openmw-mp")
++    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-client-default.cfg" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
++    #INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-client.install" DESTINATION "${SYSCONFDIR}" RENAME "tes3mp-client.cfg" COMPONENT "openmw")
++    INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-server-default.cfg" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw-mp")
++    #INSTALL(FILES "${OpenMW_BINARY_DIR}/tes3mp-server.install" DESTINATION "${SYSCONFDIR}" RENAME "tes3mp-server.cfg" COMPONENT "openmw-mp")
++    #They both do not exist
+ 
+     IF(BUILD_OPENCS)
+         INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw-cs.cfg" DESTINATION "${SYSCONFDIR}" COMPONENT "opencs")
+diff --git a/components/CMakeLists.txt b/components/CMakeLists.txt
+index c02fab8c9..a58d0bc1b 100644
+--- a/components/CMakeLists.txt
++++ b/components/CMakeLists.txt
+@@ -3,7 +3,7 @@ project (Components)
+ # Version file
+ set (VERSION_IN_FILE "${OpenMW_SOURCE_DIR}/files/version.in")
+ set (VERSION_FILE "${OpenMW_BINARY_DIR}/resources/version")
+-if (GIT_CHECKOUT)
++if (GIT_CHECKOUT AND NOT OVERWRITE_HASHES)
+   add_custom_target (git-version
+        COMMAND ${CMAKE_COMMAND}
+             -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
+@@ -16,9 +16,9 @@ if (GIT_CHECKOUT)
+             -DOPENMW_VERSION=${OPENMW_VERSION}
+             -P ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/GitVersion.cmake
+             VERBATIM)
+-else (GIT_CHECKOUT)
++else (GIT_CHECKOUT AND NOT OVERWRITE_HASHES)
+     configure_file(${VERSION_IN_FILE} ${VERSION_FILE})
+-endif (GIT_CHECKOUT)
++endif (GIT_CHECKOUT AND NOT OVERWRITE_HASHES)
+ 
+ if(BUILD_OPENMW OR BUILD_OPENCS)
+     if (OPENGL_ES)
+diff --git a/files/tes3mp-browser.desktop b/files/tes3mp-browser.desktop
+new file mode 100644
+index 000000000..91211a599
+--- /dev/null
++++ b/files/tes3mp-browser.desktop
+@@ -0,0 +1,10 @@
++[Desktop Entry]
++Type=Application
++Name=TES3MP Server Browser
++GenericName=Server Browser
++Comment=Multiplayer extension for TES3.
++Keywords=Morrowind;Multiplayer;Server Browser;TES;openmw;
++TryExec=tes3mp-browser
++Exec=tes3mp-browser
++Icon=tes3mp-browser;tes3mp;openmw
++Categories=Game;RolePlaying;
