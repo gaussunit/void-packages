@@ -1,0 +1,21 @@
+# Template file for 'pine64-base'
+pkgname=pine64-base
+version=0.1
+revision=6
+build_style=meta
+short_desc="Void Linux Pine64 platform package"
+maintainer="John <johnz@posteo.net>"
+license="Public Domain"
+homepage="http://pine64.org"
+depends="virtual?ntp-daemon pine64-uboot pine64-kernel"
+
+only_for_archs="aarch64 aarch64-musl"
+
+do_install() {
+	#Load a few modules
+
+
+	#Set proper Premissions for Video and Display
+	vmkdir usr/lib/udev/rules.d
+	echo 'KERNEL=="disp|cedar_dev|ion|mali", MODE="0770", GROUP="video"' > ${DESTDIR}/usr/lib/udev/rules.d/50-sunxi-disp.rules
+}
