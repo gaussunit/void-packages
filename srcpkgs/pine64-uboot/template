@@ -1,0 +1,67 @@
+# Template file for 'pine64-uboot'
+#
+pkgname=pine64-uboot
+version=8
+revision=1
+#wrksrc="u-boot-pine64-2014.07-${version}-pine64"
+hostmakedepends="bc dtc git"
+short_desc="Pine64 U-Boot loader"
+maintainer="JohnZ <johnz@posteo.net>"
+license="GPL-2"
+homepage="https://github.com/longsleep/u-boot-pine64"
+#distfiles="https://github.com/longsleep/u-boot-pine64/archive/v2014.07-${version}-pine64.tar.gz
+distfiles="https://github.com/longsleep/arm-trusted-firmware/archive/v1.0-1-pine64.tar.gz"
+#checksum="151ac07c16169bc9fe779c4cad0e69f8b278fac7c5231824004985ebc584c925
+checksum="f5e9bc85db1b68a4329b65fb1ff6034ddd7950fa111484bef972c3ff38004cce"
+
+only_for_archs="aarch64 aarch64-musl"
+case "$XBPS_TARGET_MACHINE" in
+	*-musl)
+		hostmakedepends+=" cross-armv7l-linux-musleabihf" #TODO: Check if this also works on aarch64 platforms
+		_uboot_cross="armv7l-linux-musleabihf" #yep uboot runs in aarch32 armv7 compatibility mode
+	;;
+	*)
+		hostmakedepends+=" cross-armv7l-linux-gnueabihf"
+		_uboot_cross="armv7l-linux-gnueabihf"
+	;;
+esac
+
+post_extract() {
+	git clone https://github.com/longsleep/u-boot-pine64 ${wrksrc} #latest release doesn't compile with gcc 6.3
+}
+
+do_build() {
+	unset CFLAGS CXXFLAGS LDFLAGS
+
+	if [ "$CROSS_BUILD" ]; then
+		make ARCH=arm CROSS_COMPILE=${_uboot_cross}- sun50iw1p1_config
+		make CROSS_COMPILE=${_uboot_cross}- ${makejobs}
+	else
+		make sun50iw1p1_config
+		make ${makejobs}
+	fi
+
+	cd ${wrksrc}/../arm-trusted-firmware-1.0-1-pine64
+
+	if [ "$CROSS_BUILD" ]; then
+		make ARCH=arm CROSS_COMPILE=${XBPS_CROSS_TRIPLET}- PLAT=sun50iw1p1 bl31
+	else
+		make PLAT=sun50iw1p1 bl31
+	fi
+
+	if [ ! -d "temp" ]; then
+		mkdir temp
+	fi
+	cd temp
+
+	dtc -Odtb -o pine64plus.dtb ${FILESDIR}/pine64plus.dts
+	cp ${FILESDIR}/boot0img.c ./
+	gcc boot0img.c -o boot0img
+
+	./boot0img -B ${FILESDIR}/boot0.bin -s ${FILESDIR}/scp.bin -d ../build/sun50iw1p1/release/bl31.bin -u ${wrksrc}/u-boot.bin -e -F pine64plus.dtb -o ${wrksrc}/u-boot-with-dtb.bin
+}
+
+do_install() {
+	vmkdir boot
+	vinstall u-boot-with-dtb.bin 644 u-boot
+}

@@ -1,0 +1,6 @@
+# INSTALL
+case "$ACTION" in
+post)
+	dd if=/boot/u-boot.bin of=/dev/mmcblk0 bs=64k
+	;;
+esac

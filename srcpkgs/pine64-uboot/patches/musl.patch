@@ -1,0 +1,33 @@
+--- include/image.h.b	2017-07-04 15:59:20.437036259 +0200
++++ include/image.h	2017-07-04 16:00:51.617039733 +0200
+@@ -19,6 +19,8 @@
+ #include "compiler.h"
+ #include <asm/byteorder.h>
+ 
++typedef unsigned long ulong;
++
+ /* Define this to avoid #ifdefs later on */
+ struct lmb;
+ 
+--- tools/mkimage.h.b	2017-07-04 15:59:37.445036907 +0200
++++ tools/mkimage.h	2017-07-04 16:00:38.004039215 +0200
+@@ -30,6 +30,8 @@
+ #define debug(fmt,args...)
+ #endif /* MKIMAGE_DEBUG */
+ 
++typedef unsigned long ulong;
++
+ static inline void *map_sysmem(ulong paddr, unsigned long len)
+ {
+ 	return (void *)(uintptr_t)paddr;
+--- tools/proftool.c.b	2017-07-04 15:59:54.001037538 +0200
++++ tools/proftool.c	2017-07-04 16:00:24.746038709 +0200
+@@ -22,6 +22,8 @@
+ 
+ #define MAX_LINE_LEN 500
+ 
++typedef unsigned long ulong;
++
+ enum {
+ 	FUNCF_TRACE	= 1 << 0,	/* Include this function in trace */
+ };
