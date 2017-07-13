@@ -1,0 +1,40 @@
+# Template file for 'VeraCrypt'
+pkgname=VeraCrypt
+_appname=veracrypt
+version=1.21
+revision=1
+create_wrksrc=yes
+only_for_archs="i686 x86_64"
+build_style=gnu-makefile
+hostmakedepends="wxWidgets wxWidgets-devel yasm fuse fuse-devel pkg-config makeself"
+makedepends="wxWidgets wxWidgets-devel yasm fuse fuse-devel pkg-config makeself"
+depends="wxWidgets fuse"
+short_desc="VeraCrypt is a free open source disk encryption software"
+maintainer="Viatcheslav E. Kouznetsov <glorysmith@gmail.com>"
+license="Apache 2.0"
+homepage="https://www.veracrypt.fr/en"
+_filename="${pkgname}_${version}_Source.tar.bz2"
+distfiles="https://launchpadlibrarian.net/328011925/${_filename}"
+checksum=44717d24b8deff2db9dd0365572063e38bbe4a59438a8c3c07675b5eed370358
+
+do_extract() {
+	tar xf ${XBPS_SRCDISTDIR}/${pkgname}-${version}/${_filename} \
+	  -C ${wrksrc}/
+}
+
+do_build() {
+	cd ${wrksrc}/src
+	make
+}
+
+do_install() {
+	cd ${wrksrc}/src
+	vbin Main/${_appname}
+	vbin Setup/Linux/${_appname}-uninstall.sh
+	vdoc License.txt
+	vcopy ../doc/html usr/share/doc/${pkgname}
+	vmkdir usr/share/applications
+	vmkdir usr/share/pixmaps
+	vcopy Resources/Icons/VeraCrypt-256x256.xpm usr/share/pixmaps/${_appname}.xpm
+	vcopy Setup/Linux/${_appname}.desktop usr/share/applications/${_appname}.desktop
+}
