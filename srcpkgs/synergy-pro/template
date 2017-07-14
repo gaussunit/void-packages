@@ -1,0 +1,61 @@
+# Template file for 'synergy'
+pkgname=synergy-pro
+version=1.8.8
+revision=2
+wrksrc="${pkgname%-pro}-${version}-stable"
+build_style=cmake
+hostmakedepends="unzip pkg-config"
+makedepends="avahi-compat-libs-devel libcurl-devel
+ libSM-devel libXext-devel libXrandr-devel libXtst-devel libXinerama-devel"
+short_desc="Share a single mouse and keyboard between multiple computers"
+maintainer="Juan RP <xtraeme@voidlinux.eu>"
+homepage="http://synergy-foss.org/"
+license="GPL-2"
+distfiles="https://github.com/symless/synergy/archive/v${version}-stable.tar.gz"
+checksum=85c388f93881d741981ce3c675e840a52a76883cb2cea1da306c0c453c5d7d9b
+conflicts="synergy>=0"
+
+CXXFLAGS="-pthread"
+
+post_extract() {
+	cd ext
+	unzip gmock-1.6.0.zip -d gmock-1.6.0
+	unzip gtest-1.6.0.zip -d gtest-1.6.0
+}
+
+if [ -z "$CROSS_BUILD" ]; then
+	makedepends+=" qt5-devel"
+	post_build() {
+		CXXFLAGS+=" $(pkg-config --cflags avahi-compat-libdns_sd)"
+		# qt5 gui
+		cd $wrksrc/src/gui
+		qmake QMAKE_CXXFLAGS="$CXXFLAGS" QMAKE_LFLAGS="$LDFLAGS"
+		make ${makejobs}
+	}
+	synergy-pro-gui_package() {
+		depends="desktop-file-utils ${sourcepkg}>=${version}_${revision}"
+		conflicts="synergy-gui"
+		pkg_install() {
+			vbin ${wrksrc}/bin/synergy
+			vmove usr/share/pixmaps
+			vmove usr/share/applications
+		}
+	}
+fi
+
+do_install() {
+	vbin bin/synergyc
+	vbin bin/synergys
+	vbin bin/syntool
+
+	vmkdir usr/share/examples/${pkgname}
+	install -m644 doc/synergy.conf.example* \
+		${DESTDIR}/usr/share/examples/${pkgname}
+
+	vinstall ${FILESDIR}/synergy.png 644 usr/share/pixmaps
+	vinstall ${FILESDIR}/synergy.desktop 644 usr/share/applications
+
+	vsv synergys
+	vsv synergyc
+}
+
