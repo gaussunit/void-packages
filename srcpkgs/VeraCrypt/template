@@ -4,11 +4,10 @@ _appname=veracrypt
 version=1.21
 revision=1
 create_wrksrc=yes
-only_for_archs="i686 x86_64"
+nocross="wxWidgets"
 build_style=gnu-makefile
-hostmakedepends="wxWidgets wxWidgets-devel yasm fuse fuse-devel pkg-config makeself"
-makedepends="wxWidgets wxWidgets-devel yasm fuse fuse-devel pkg-config makeself"
-depends="wxWidgets fuse"
+hostmakedepends="yasm pkg-config"
+makedepends="wxWidgets-devel fuse-devel"
 short_desc="VeraCrypt is a free open source disk encryption software"
 maintainer="Viatcheslav E. Kouznetsov <glorysmith@gmail.com>"
 license="Apache 2.0"
@@ -24,7 +23,7 @@ do_extract() {
 
 do_build() {
 	cd ${wrksrc}/src
-	make
+	make ${makejobs}
 }
 
 do_install() {
