@@ -1,0 +1,25 @@
+# Template file for 'CallFF'
+pkgname=CallFF
+version=0.009
+revision=1
+_githash="da94b59ffe95d45bf98b9264e3d1279c9f6ebb6b"
+wrksrc="${pkgname}-${_githash}"
+build_style=cmake
+short_desc="CallFF library allows to making foreign functions calls"
+maintainer="John <johnz@posteo.net>"
+license="LGPL-3"
+homepage="https://github.com/Koncord/CallFF"
+distfiles="https://github.com/Koncord/CallFF/archive/${_githash}.tar.gz"
+checksum=cf576dc7926428a6394ba172b0f56e44d06ce14a85978e09a97d55d40f86611c
+
+case "${XBPS_TARGET_MACHINE}" in
+	x86_64* | i686* );;
+	*)broken="Not Supported yet";;
+	#https://github.com/Koncord/CallFF/blob/master/README.md
+esac
+
+do_install() {
+	vinstall include/call.hpp 644 usr/include
+	vinstall include/callarg.hpp 644 usr/include
+	vinstall build/src/libcallff.a 755 usr/lib
+}
