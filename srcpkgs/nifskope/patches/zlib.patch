@@ -1,0 +1,35 @@
+diff --git a/NifSkope.pro NifSkope.pro
+index cf12780..7652dca 100644
+--- a/NifSkope.pro
++++ NifSkope.pro
+@@ -18,7 +18,7 @@ CONFIG += c++11
+ 
+ # Dependencies
+ CONFIG += nvtristrip qhull soil zlib lz4 fsengine
+-
++CONFIG -= zlib
+ # Debug/Release options
+ CONFIG(debug, debug|release) {
+ 	# Debug Options
+@@ -491,7 +491,7 @@ win32 {
+ }
+ 
+ unix:!macx {
+-	LIBS += -lGLU
++	LIBS += -lGLU -lz
+ }
+ 
+ macx {
+diff --git a/lib/fsengine/bsa.cpp lib/fsengine/bsa.cpp
+index 115a785..b92d611 100644
+--- a/lib/fsengine/bsa.cpp
++++ lib/fsengine/bsa.cpp
+@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include "bsa.h"
+ #include "dds.h"
+-#include "zlib/zlib.h"
++#include "zlib.h"
+ #include "lz4frame.h"
+ 
+ #include <QByteArray>

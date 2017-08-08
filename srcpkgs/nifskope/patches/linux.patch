@@ -1,0 +1,479 @@
+diff --git a/.gitmodules .gitmodules
+index 56b84bd..f39f05e 100644
+--- a/.gitmodules
++++ .gitmodules
+@@ -1,9 +1,9 @@
+ [submodule "docsys"]
+ 	path = build/docsys
+-	url = git://github.com/niftools/nifdocsys.git
++	url = https://github.com/niftools/nifdocsys.git
+ [submodule "qhull"]
+ 	path = lib/qhull
+-	url = git@github.com:qhull/qhull.git
++	url = https://github.com/qhull/qhull.git
+ [submodule "lib/zlib"]
+ 	path = lib/zlib
+-	url = git@github.com:madler/zlib.git
++	url = https://github.com/madler/zlib.git
+diff --git a/.travis.yml .travis.yml
+new file mode 100644
+index 0000000..565d7d0
+--- /dev/null
++++ .travis.yml
+@@ -0,0 +1,37 @@
++dist: trusty
++sudo: required
++language: cpp
++os:
++  - linux
++  - osx
++addons:
++  apt:
++    sources:
++      - sourceline: 'ppa:beineri/opt-qt551-trusty'
++    packages: [
++      # static analysis
++      clang-3.6,
++      # qt5 requirement
++      qt55-meta-minimal
++    ]
++matrix:
++  fast_finish: true
++  include:
++    - os: linux
++      env:
++        ANALYZE="scan-build-3.6 --use-cc clang-3.6 --use-c++ clang++-3.6 "
++      compiler: clang
++  allow_failures:
++    - env: ANALYZE="scan-build-3.6 --use-cc clang-3.6 --use-c++ clang++-3.6 "
++
++before_install:
++  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then QT_ENV_SCRIPT=$(find /opt -name 'qt*-env.sh'); source $QT_ENV_SCRIPT; fi
++  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew update; brew install qt@5.5; export PATH="/usr/local/opt/qt@5.5/bin:$PATH"; fi
++
++script:
++  - qmake --version
++  - qmake -makefile NifSkope.pro
++  - ${ANALYZE}make -j4
++
++notifications:
++    email: false
+diff --git a/NifSkope.pro NifSkope.pro
+index 563d19f..cf12780 100644
+--- a/NifSkope.pro
++++ NifSkope.pro
+@@ -17,8 +17,7 @@ contains(QT_VERSION, ^5\\.[0-4]\\..*) {
+ CONFIG += c++11
+ 
+ # Dependencies
+-CONFIG += nvtristrip qhull soil zlib lz4
+-win32:CONFIG += fsengine
++CONFIG += nvtristrip qhull soil zlib lz4 fsengine
+ 
+ # Debug/Release options
+ CONFIG(debug, debug|release) {
+@@ -207,6 +206,7 @@ HEADERS += \
+ 	src/version.h \
+ 	lib/half.h \
+ 	lib/dds.h \
++	lib/dxgiformat.h \
+ 	src/gl/bsshape.h \
+ 	src/material.h
+ 
+diff --git a/appveyor.yml appveyor.yml
+new file mode 100644
+index 0000000..fae5216
+--- /dev/null
++++ appveyor.yml
+@@ -0,0 +1,50 @@
++version: "{build}"
++
++platform:
++    - win32
++    - x64
++
++configuration:
++    - debug
++    - release
++
++matrix:
++    fast_finish: true
++
++os: Visual Studio 2015
++
++# We want the git revision for versioning,
++# so shallow clones don't work.
++clone_depth: 1
++
++clone_folder: C:\projects\nifskope
++
++install:
++    - if %PLATFORM%==win32 set QTDIR=C:\Qt\5.6\msvc2015
++    - if %PLATFORM%==x64 set QTDIR=C:\Qt\5.6\msvc2015_64
++    - set PATH=%PATH%;%QTDIR%\bin;
++
++build_script:
++    - git submodule update --init --recursive # Appveyor doesn't clone recursively.
++    - qmake CONFIG+=%CONFIGURATION% -Wall -spec win32-msvc2015 -tp vc NifSkope.pro
++    - msbuild NifSkope.vcxproj /t:Build /p:Configuration=%configuration% /m:2 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
++
++after_build:
++    - if %CONFIGURATION%==debug set DEBUG_POSTFIX=_debug
++    - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\bin\%CONFIGURATION%
++    - set BUILD_NAME=nifskope_%platform%%DEBUG_POSTFIX%.zip
++    - 7z a %BUILD_NAME% %BUILD_DIR%
++    - 7z rn %BUILD_NAME% %CONFIGURATION% NifSkope
++
++test: off
++
++artifacts:
++    - path: nifskope_win32.zip
++      name: nifskope_win32
++    - path: nifskope_x64.zip
++      name: nifskope_x64
++    - path: nifskope_win32_debug.zip
++      name: nifskope_win32_debug
++    - path: nifskope_x64_debug.zip
++      name: nifskope_x64_debug
++
+-Subproject commit e67ce4a6fc3bd0e9ae793bd6f08c3e2bf1bfdf74
++Subproject commit 0ffd95a50c277e761ab664b68a827502d163c083
+diff --git a/lib/dds.h lib/dds.h
+index 245b6d8..fe8225b 100644
+--- a/lib/dds.h
++++ lib/dds.h
+@@ -1,20 +1,30 @@
+ //--------------------------------------------------------------------------------------
+ // dds.h
+ //
+-// This header defines constants and structures that are useful when parsing 
++// This header defines constants and structures that are useful when parsing
+ // DDS files.  DDS files were originally designed to use several structures
+ // and constants that are native to DirectDraw and are defined in ddraw.h,
+-// such as DDSURFACEDESC2 and DDSCAPS2.  This file defines similar 
+-// (compatible) constants and structures so that one can use DDS files 
++// such as DDSURFACEDESC2 and DDSCAPS2.  This file defines similar
++// (compatible) constants and structures so that one can use DDS files
+ // without needing to include ddraw.h.
+ //--------------------------------------------------------------------------------------
+ 
+ #ifndef _DDS_H_
+ #define _DDS_H_
+ 
+-#include <windows.h>
+ #include <dxgiformat.h>
+ 
++typedef unsigned char BYTE;
++typedef unsigned short WORD;
++typedef unsigned long DWORD;
++
++#ifndef MAKEFOURCC
++    #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
++                ((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) |   \
++                ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
++#endif //defined(MAKEFOURCC)
++
++
+ #pragma pack(push,1)
+ 
+ #define DDS_MAGIC 0x20534444 // "DDS "
+@@ -71,7 +81,7 @@ const DDS_PIXELFORMAT DDSPF_R5G6B5 =
+ const DDS_PIXELFORMAT DDSPF_DX10 =
+     { sizeof(DDS_PIXELFORMAT), DDS_FOURCC, MAKEFOURCC('D','X','1','0'), 0, 0, 0, 0, 0 };
+ 
+-#define DDS_HEADER_FLAGS_TEXTURE        0x00001007  // DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT 
++#define DDS_HEADER_FLAGS_TEXTURE        0x00001007  // DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT
+ #define DDS_HEADER_FLAGS_MIPMAP         0x00020000  // DDSD_MIPMAPCOUNT
+ #define DDS_HEADER_FLAGS_VOLUME         0x00800000  // DDSD_DEPTH
+ #define DDS_HEADER_FLAGS_PITCH          0x00000008  // DDSD_PITCH
+@@ -138,7 +148,7 @@ typedef struct
+     DWORD dwReserved2[3];
+ } DDS_HEADER;
+ 
+-typedef struct 
++typedef struct
+ {
+     DXGI_FORMAT dxgiFormat;
+     DDS_RESOURCE_DIMENSION resourceDimension;
+diff --git a/lib/dxgiformat.h lib/dxgiformat.h
+new file mode 100644
+index 0000000..0c731b5
+--- /dev/null
++++ lib/dxgiformat.h
+@@ -0,0 +1,153 @@
++/*
++ * Copyright 2007 Andras Kovacs
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
++ */
++
++/*
++ * Oracle LGPL Disclaimer: For the avoidance of doubt, except that if any license choice
++ * other than GPL or LGPL is available it will apply instead, Oracle elects to use only
++ * the Lesser General Public License version 2.1 (LGPLv2) at this time for any software where
++ * a choice of LGPL license versions is made available with the language indicating
++ * that LGPLv2 or any later version may be used, or where a choice of which version
++ * of the LGPL is applied is otherwise unspecified.
++ */
++
++#ifndef __dxgiformat_h__
++#define __dxgiformat_h__
++
++#define DXGI_FORMAT_DEFINED 1
++
++typedef enum DXGI_FORMAT {
++    DXGI_FORMAT_UNKNOWN                 = 0,
++    DXGI_FORMAT_R32G32B32A32_TYPELESS   = 1,
++    DXGI_FORMAT_R32G32B32A32_FLOAT      = 2,
++    DXGI_FORMAT_R32G32B32A32_UINT       = 3,
++    DXGI_FORMAT_R32G32B32A32_SINT       = 4,
++    DXGI_FORMAT_R32G32B32_TYPELESS      = 5,
++    DXGI_FORMAT_R32G32B32_FLOAT         = 6,
++    DXGI_FORMAT_R32G32B32_UINT          = 7,
++    DXGI_FORMAT_R32G32B32_SINT          = 8,
++    DXGI_FORMAT_R16G16B16A16_TYPELESS   = 9,
++    DXGI_FORMAT_R16G16B16A16_FLOAT      = 10,
++    DXGI_FORMAT_R16G16B16A16_UNORM      = 11,
++    DXGI_FORMAT_R16G16B16A16_UINT       = 12,
++    DXGI_FORMAT_R16G16B16A16_SNORM      = 13,
++    DXGI_FORMAT_R16G16B16A16_SINT       = 14,
++    DXGI_FORMAT_R32G32_TYPELESS         = 15,
++    DXGI_FORMAT_R32G32_FLOAT            = 16,
++    DXGI_FORMAT_R32G32_UINT             = 17,
++    DXGI_FORMAT_R32G32_SINT             = 18,
++    DXGI_FORMAT_R32G8X24_TYPELESS       = 19,
++    DXGI_FORMAT_D32_FLOAT_S8X24_UINT    = 20,
++    DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS= 21,
++    DXGI_FORMAT_X32_TYPELESS_G8X24_UINT = 22,
++    DXGI_FORMAT_R10G10B10A2_TYPELESS    = 23,
++    DXGI_FORMAT_R10G10B10A2_UNORM       = 24,
++    DXGI_FORMAT_R10G10B10A2_UINT        = 25,
++    DXGI_FORMAT_R11G11B10_FLOAT         = 26,
++    DXGI_FORMAT_R8G8B8A8_TYPELESS       = 27,
++    DXGI_FORMAT_R8G8B8A8_UNORM          = 28,
++    DXGI_FORMAT_R8G8B8A8_UNORM_SRGB     = 29,
++    DXGI_FORMAT_R8G8B8A8_UINT           = 30,
++    DXGI_FORMAT_R8G8B8A8_SNORM          = 31,
++    DXGI_FORMAT_R8G8B8A8_SINT           = 32,
++    DXGI_FORMAT_R16G16_TYPELESS         = 33,
++    DXGI_FORMAT_R16G16_FLOAT            = 34,
++    DXGI_FORMAT_R16G16_UNORM            = 35,
++    DXGI_FORMAT_R16G16_UINT             = 36,
++    DXGI_FORMAT_R16G16_SNORM            = 37,
++    DXGI_FORMAT_R16G16_SINT             = 38,
++    DXGI_FORMAT_R32_TYPELESS            = 39,
++    DXGI_FORMAT_D32_FLOAT               = 40,
++    DXGI_FORMAT_R32_FLOAT               = 41,
++    DXGI_FORMAT_R32_UINT                = 42,
++    DXGI_FORMAT_R32_SINT                = 43,
++    DXGI_FORMAT_R24G8_TYPELESS          = 44,
++    DXGI_FORMAT_D24_UNORM_S8_UINT       = 45,
++    DXGI_FORMAT_R24_UNORM_X8_TYPELESS   = 46,
++    DXGI_FORMAT_X24_TYPELESS_G8_UINT    = 47,
++    DXGI_FORMAT_R8G8_TYPELESS           = 48,
++    DXGI_FORMAT_R8G8_UNORM              = 49,
++    DXGI_FORMAT_R8G8_UINT               = 50,
++    DXGI_FORMAT_R8G8_SNORM              = 51,
++    DXGI_FORMAT_R8G8_SINT               = 52,
++    DXGI_FORMAT_R16_TYPELESS            = 53,
++    DXGI_FORMAT_R16_FLOAT               = 54,
++    DXGI_FORMAT_D16_UNORM               = 55,
++    DXGI_FORMAT_R16_UNORM               = 56,
++    DXGI_FORMAT_R16_UINT                = 57,
++    DXGI_FORMAT_R16_SNORM               = 58,
++    DXGI_FORMAT_R16_SINT                = 59,
++    DXGI_FORMAT_R8_TYPELESS             = 60,
++    DXGI_FORMAT_R8_UNORM                = 61,
++    DXGI_FORMAT_R8_UINT                 = 62,
++    DXGI_FORMAT_R8_SNORM                = 63,
++    DXGI_FORMAT_R8_SINT                 = 64,
++    DXGI_FORMAT_A8_UNORM                = 65,
++    DXGI_FORMAT_R1_UNORM                = 66,
++    DXGI_FORMAT_R9G9B9E5_SHAREDEXP      = 67,
++    DXGI_FORMAT_R8G8_B8G8_UNORM         = 68,
++    DXGI_FORMAT_G8R8_G8B8_UNORM         = 69,
++    DXGI_FORMAT_BC1_TYPELESS            = 70,
++    DXGI_FORMAT_BC1_UNORM               = 71,
++    DXGI_FORMAT_BC1_UNORM_SRGB          = 72,
++    DXGI_FORMAT_BC2_TYPELESS            = 73,
++    DXGI_FORMAT_BC2_UNORM               = 74,
++    DXGI_FORMAT_BC2_UNORM_SRGB          = 75,
++    DXGI_FORMAT_BC3_TYPELESS            = 76,
++    DXGI_FORMAT_BC3_UNORM               = 77,
++    DXGI_FORMAT_BC3_UNORM_SRGB          = 78,
++    DXGI_FORMAT_BC4_TYPELESS            = 79,
++    DXGI_FORMAT_BC4_UNORM               = 80,
++    DXGI_FORMAT_BC4_SNORM               = 81,
++    DXGI_FORMAT_BC5_TYPELESS            = 82,
++    DXGI_FORMAT_BC5_UNORM               = 83,
++    DXGI_FORMAT_BC5_SNORM               = 84,
++    DXGI_FORMAT_B5G6R5_UNORM            = 85,
++    DXGI_FORMAT_B5G5R5A1_UNORM          = 86,
++    DXGI_FORMAT_B8G8R8A8_UNORM          = 87,
++    DXGI_FORMAT_B8G8R8X8_UNORM          = 88,
++    DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM = 89,
++    DXGI_FORMAT_B8G8R8A8_TYPELESS       = 90,
++    DXGI_FORMAT_B8G8R8A8_UNORM_SRGB     = 91,
++    DXGI_FORMAT_B8G8R8X8_TYPELESS       = 92,
++    DXGI_FORMAT_B8G8R8X8_UNORM_SRGB     = 93,
++    DXGI_FORMAT_BC6H_TYPELESS           = 94,
++    DXGI_FORMAT_BC6H_UF16               = 95,
++    DXGI_FORMAT_BC6H_SF16               = 96,
++    DXGI_FORMAT_BC7_TYPELESS            = 97,
++    DXGI_FORMAT_BC7_UNORM               = 98,
++    DXGI_FORMAT_BC7_UNORM_SRGB          = 99,
++    DXGI_FORMAT_AYUV                    = 100,
++    DXGI_FORMAT_Y410                    = 101,
++    DXGI_FORMAT_Y416                    = 102,
++    DXGI_FORMAT_NV12                    = 103,
++    DXGI_FORMAT_P010                    = 104,
++    DXGI_FORMAT_P016                    = 105,
++    DXGI_FORMAT_420_OPAQUE              = 106,
++    DXGI_FORMAT_YUY2                    = 107,
++    DXGI_FORMAT_Y210                    = 108,
++    DXGI_FORMAT_Y216                    = 109,
++    DXGI_FORMAT_NV11                    = 110,
++    DXGI_FORMAT_AI44                    = 111,
++    DXGI_FORMAT_IA44                    = 112,
++    DXGI_FORMAT_P8                      = 113,
++    DXGI_FORMAT_A8P8                    = 114,
++    DXGI_FORMAT_B4G4R4A4_UNORM          = 115,
++    DXGI_FORMAT_FORCE_UINT              = 0xffffffff
++} DXGI_FORMAT;
++
++#endif
+diff --git a/src/gl/dds/ColorBlock.cpp src/gl/dds/ColorBlock.cpp
+index 43ea888..b158882 100644
+--- a/src/gl/dds/ColorBlock.cpp
++++ src/gl/dds/ColorBlock.cpp
+@@ -42,7 +42,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "ColorBlock.h"
+ 
+ #include "Common.h"
+-
++#include <math.h>
+ 
+ // Get approximate luminance.
+ inline static uint colorLuminance( Color32 c )
+@@ -79,8 +79,8 @@ ColorBlock::ColorBlock( const Image * img, uint x, uint y )
+ 
+ void ColorBlock::init( const Image * img, uint x, uint y )
+ {
+-	const uint bw = min( img->width() - x, 4U );
+-	const uint bh = min( img->height() - y, 4U );
++	const uint bw = std::min( img->width() - x, 4U );
++	const uint bh = std::min( img->height() - y, 4U );
+ 
+ 	static int remainder[] = {
+ 		0, 0, 0, 0,
+diff --git a/src/gl/dds/Common.h src/gl/dds/Common.h
+index f3d24c4..9c49a59 100644
+--- a/src/gl/dds/Common.h
++++ src/gl/dds/Common.h
+@@ -33,14 +33,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #ifndef _DDS_COMMON_H
+ #define _DDS_COMMON_H
+ 
+-#ifndef min
+-#define min( a, b ) ( (a) <= (b) ? (a) : (b) )
+-#endif
+-#ifndef max
+-#define max( a, b ) ( (a) >= (b) ? (a) : (b) )
+-#endif
++#include <algorithm>
++
+ #ifndef clamp
+-#define clamp( x, a, b ) min( max( (x), (a) ), (b) )
++#define clamp( x, a, b ) std::min( std::max( (x), (a) ), (b) )
+ #endif
+ 
+ template <typename T>
+diff --git a/src/gl/dds/DirectDrawSurface.cpp src/gl/dds/DirectDrawSurface.cpp
+index 09d1b8b..ffd6615 100644
+--- a/src/gl/dds/DirectDrawSurface.cpp
++++ src/gl/dds/DirectDrawSurface.cpp
+@@ -689,8 +689,8 @@ void DirectDrawSurface::mipmap( Image * img, uint face, uint mipmap )
+ 
+ 	// Compute width and height.
+ 	for ( uint m = 0; m < mipmap; m++ ) {
+-		w = max( 1U, w / 2 );
+-		h = max( 1U, h / 2 );
++		w = std::max( 1U, w / 2 );
++		h = std::max( 1U, h / 2 );
+ 	}
+ 
+ 	img->allocate( w, h );
+@@ -776,8 +776,8 @@ void DirectDrawSurface::readBlockImage( Image * img )
+ 			readBlock( &block );
+ 
+ 			// Write color block.
+-			for ( uint y = 0; y < min( 4U, h - 4 * by ); y++ ) {
+-				for ( uint x = 0; x < min( 4U, w - 4 * bx ); x++ ) {
++			for ( uint y = 0; y < std::min( 4U, h - 4 * by ); y++ ) {
++				for ( uint x = 0; x < std::min( 4U, w - 4 * bx ); x++ ) {
+ 					img->pixel( 4 * bx + x, 4 * by + y ) = block.color( x, y );
+ 				}
+ 			}
+@@ -883,9 +883,9 @@ uint DirectDrawSurface::mipmapSize( uint mipmap ) const
+ 	uint d = depth();
+ 
+ 	for ( uint m = 0; m < mipmap; m++ ) {
+-		w = max( 1U, w / 2 );
+-		h = max( 1U, h / 2 );
+-		d = max( 1U, d / 2 );
++		w = std::max( 1U, w / 2 );
++		h = std::max( 1U, h / 2 );
++		d = std::max( 1U, d / 2 );
+ 	}
+ 
+ 	if ( header.pf.flags & DDPF_FOURCC ) {
+diff --git a/src/gl/gltexloaders.cpp src/gl/gltexloaders.cpp
+index f59c991..96dea9f 100644
+--- a/src/gl/gltexloaders.cpp
++++ src/gl/gltexloaders.cpp
+@@ -1898,8 +1898,8 @@ bool texSaveNIF( NifModel * nif, const QString & filepath, QModelIndex & iData )
+ 
+ 			// generate next offset, resize
+ 			mipmapOffset += mipmapWidth * mipmapHeight * 4;
+-			mipmapWidth   = max( 1, mipmapWidth / 2 );
+-			mipmapHeight  = max( 1, mipmapHeight / 2 );
++			mipmapWidth   = std::max( 1, mipmapWidth / 2 );
++			mipmapHeight  = std::max( 1, mipmapHeight / 2 );
+ 		}
+ 
+ 		// set total pixel size
+@@ -2065,9 +2065,9 @@ bool texSaveNIF( NifModel * nif, const QString & filepath, QModelIndex & iData )
+ 
+ 			if ( ddsHeader.ddsPixelFormat.dwFlags & DDPF_FOURCC ) {
+ 				if ( ddsHeader.ddsPixelFormat.dwFourCC == FOURCC_DXT1 ) {
+-					mipmapOffset += max( 8, ( mipmapWidth * mipmapHeight / 2 ) );
++					mipmapOffset += std::max( 8, ( mipmapWidth * mipmapHeight / 2 ) );
+ 				} else if ( ddsHeader.ddsPixelFormat.dwFourCC == FOURCC_DXT5 ) {
+-					mipmapOffset += max( 16, ( mipmapWidth * mipmapHeight ) );
++					mipmapOffset += std::max( 16, ( mipmapWidth * mipmapHeight ) );
+ 				}
+ 			} else if ( ddsHeader.ddsPixelFormat.dwBPP == 24 ) {
+ 				mipmapOffset += ( mipmapWidth * mipmapHeight * 3 );
+@@ -2075,8 +2075,8 @@ bool texSaveNIF( NifModel * nif, const QString & filepath, QModelIndex & iData )
+ 				mipmapOffset += ( mipmapWidth * mipmapHeight * 4 );
+ 			}
+ 
+-			mipmapWidth  = max( 1, mipmapWidth / 2 );
+-			mipmapHeight = max( 1, mipmapHeight / 2 );
++			mipmapWidth  = std::max( 1, mipmapWidth / 2 );
++			mipmapHeight = std::max( 1, mipmapHeight / 2 );
+ 		}
+ 
+ 		nif->set<quint32>( iData, "Num Pixels", mipmapOffset );
