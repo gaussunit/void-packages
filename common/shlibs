@@ -3107,3 +3107,4 @@ libgnuradio-audio-3.7.12git.so.0.0.0 gnuradio-3.7.12git_1
 libgnuradio-noaa-3.7.12git.so.0.0.0 gnuradio-3.7.12git_1
 libbctoolbox.so.1 bctoolbox-0.5.1_1
 libbctoolbox-tester.so.1 bctoolbox-0.5.1_1
+libantlr3c.so libantlr3c-3.4_1
