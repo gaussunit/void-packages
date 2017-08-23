@@ -3074,3 +3074,4 @@ libbctoolbox.so.1 bctoolbox-0.5.1_1
 libbctoolbox-tester.so.1 bctoolbox-0.5.1_1
 libantlr3c.so libantlr3c-3.4_1
 libortp.so.13 ortp-1.0.2_1
+libbzrtp.so.0 bzrtp-1.0.6_1

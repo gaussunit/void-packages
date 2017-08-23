@@ -1,0 +1,25 @@
+# Template file for 'bzrtp'
+pkgname=bzrtp
+version=1.0.6
+revision=1
+short_desc="Opensource implementation of ZRTP keys exchange protocol"
+maintainer="JohnZ <johnz@posteo.net>"
+build_style="cmake"
+makedepends="mbedtls-devel libxml2-devel bctoolbox-devel sqlite-devel"
+license="GPL-2"
+homepage="http://www.linphone.org"
+distfiles="https://www.linphone.org/releases/sources/bzrtp/bzrtp-${version}.tar.gz"
+checksum=bf48b0298d614a04b7b9d76b770ab7c6c3bc84624674efba523d5e90e09cc08b
+configure_args="-DENABLE_TESTS=0 -DCMAKE_SKIP_INSTALL_RPATH=ON"
+
+
+bzrtp-devel_package() {
+	depends="${makedepends} ${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove "usr/lib/*.so"
+		vmove "usr/lib/*.a"
+		vmove usr/share/bzrtp/cmake
+	}
+}
