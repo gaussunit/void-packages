@@ -1,0 +1,29 @@
+# Template file for 'mediastreamer'
+pkgname=mediastreamer
+version=2.16.1
+revision=1
+short_desc="Powerful and lightweight streaming engine for voice/video telephony"
+maintainer="John <johnz@posteo.net>"
+build_style="cmake"
+hostmakedepends="python"
+makedepends="ffmpeg-devel libupnp-devel opus-devel libXv-devel speex-devel
+ glew-devel libsrtp-devel ortp-devel v4l-utils-devel alsa-lib-devel
+ pulseaudio-devel mbedtls-devel libvpx-devel bzrtp-devel"
+license="GPL-2"
+homepage="https://www.linphone.org/technical-corner/mediastreamer2/overview"
+distfiles="https://www.linphone.org/releases/sources/mediastreamer/mediastreamer-${version}.tar.gz"
+checksum=33351f9409e229a00aaf831930916e1934d8e972773e95f7b7177c9e4cc61772
+
+configure_args="-DENABLE_STRICT=0 -DENABLE_UNIT_TESTS=0"
+
+mediastreamer-devel_package() {
+	depends="${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/bin
+		vmove usr/include
+		vmove "usr/lib/*.a"
+		vmove "usr/lib/*.so"
+		vmove usr/share/Mediastreamer2/cmake
+	}
+}
