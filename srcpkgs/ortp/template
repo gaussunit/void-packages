@@ -1,0 +1,27 @@
+# Template file for 'ortp'
+pkgname=ortp
+version=1.0.2
+revision=1
+wrksrc="${pkgname}-${version}-0"
+short_desc="A Real-time Transport Protocol (RTP) library"
+maintainer="John <johnz@posteo.net>"
+build_style="cmake"
+license="GPL-2"
+homepage="http://www.linphone.org/index.php/eng/code_review/ortp"
+distfiles="https://www.linphone.org/releases/sources/ortp/ortp-${version}.tar.gz"
+checksum=a51551194332ac62b47865dc1e60893ece4922c489a7b0a780b8be562978d804
+
+hostmakedepends="libtool pkg-config"
+makedepends="bctoolbox-devel"
+
+ortp-devel_package() {
+	depends="${makedepends} ${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove "usr/lib/*.so"
+		vmove "usr/lib/*.a"
+		vmove usr/share/oRTP/cmake
+		vmove usr/lib/pkgconfig
+	}
+}
