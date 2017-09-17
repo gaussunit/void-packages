@@ -59,3 +59,29 @@ musl-devel_package() {
 		vmove usr/lib/*.o
 	}
 }
+
+musl-compat_package() {
+	depends="${sourcepkg}"
+	short_desc+="compatibility libraries for glibc"
+	pkg_install() {
+		mkdir -p "$PKGDESTDIR"/usr/lib
+		case "$XBPS_TARGET_MACHINE" in
+			armel*) _ld="ld-linux.so.3" ;;
+			armhf* | armv7) _ld="ld-linux-armhf.so.3" ;;
+			aarch64*) _ld="ld-linux-aarch64.so.1" ;;
+			i686*) _ld="ld-linux.so.2" ;;
+			x86_64*) _ld="ld-linux-x86-64.so.2"
+			# go precompiled binary uses /lib64/ld-linux-x86-64.so.2
+			# so we add a symlink
+			ln -s lib "$PKGDESTDIR"/lib64
+			;;
+			mips* | s390*) _ld="ld.so.1" ;;
+			ppc64le*) _ld="ld64.so.2" ;;
+		esac
+		ln -sf "/usr/lib/libc.so" "$PKGDESTDIR/usr/lib/$_ld"
+
+		for i in libc.so.6 libcrypt.so.1 libm.so.6 libpthread.so.0 librt.so.1 libutil.so.1; do
+			ln -sf "/usr/lib/libc.musl-${XBPS_TARGET_MACHINE}.so.1" "$PKGDESTDIR/usr/lib/$i"
+		done
+	}
+}
