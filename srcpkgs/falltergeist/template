@@ -1,0 +1,19 @@
+# Template file for 'falltergeist'
+pkgname=falltergeist
+version=0.3.1
+revision=1
+build_style=cmake
+makedepends="SDL2-devel SDL2_mixer-devel SDL2_image-devel glew-devel zlib-devel glm"
+short_desc="Opensource crossplatform Fallout 2™ game engine"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://falltergeist.org/"
+distfiles="https://github.com/falltergeist/falltergeist/archive/${version}.tar.gz"
+checksum=a0aa11b470ad289455061e7e6f3b05c2e370f17403f4739fcb904f897b30d217
+
+case "$XBPS_TARGET_MACHINE" in
+	armv[67]*)
+		makedepends+=" rpi-userland"
+		depends="rpi-userland"
+		;;
+esac
