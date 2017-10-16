@@ -1,0 +1,86 @@
+--- PlainSocketImpl.c	2017-10-15 13:05:59.554179092 +0200
++++ src/solaris/native/java/net/PlainSocketImpl.c	2017-10-15 13:08:35.868182948 +0200
+@@ -43,8 +43,10 @@
+ #endif
+ #ifdef __linux__
+ #include <unistd.h>
++#ifdef __GLIBC__
+ #include <sys/sysctl.h>
+ #endif
++#endif
+ 
+ #include "jvm.h"
+ #include "jni_util.h"
+--- PlainDatagramSocketImpl.c	2017-10-15 13:10:49.683186249 +0200
++++ src/solaris/native/java/net/PlainDatagramSocketImpl.c	2017-10-15 13:11:18.507186960 +0200
+@@ -41,7 +41,9 @@
+ #endif
+ #ifdef __linux__
+ #include <unistd.h>
++#ifdef __GLIBC__
+ #include <sys/sysctl.h>
++#endif
+ #include <sys/utsname.h>
+ #include <netinet/ip.h>
+ 
+--- linux_close.c	2017-10-15 13:18:05.383196998 +0200
++++ src/solaris/native/java/net/linux_close.c	2017-10-15 13:28:16.665212078 +0200
+@@ -56,6 +56,9 @@
+ /*
+  * Signal to unblock thread
+  */
++#if !defined (__SIGRTMAX)
++#define __SIGRTMAX (NSIG-1)
++#endif
+ static int sigWakeup = (__SIGRTMAX - 2);
+ 
+ /*
+--- NativeThread.c	2017-10-15 13:30:03.131214704 +0200
++++ src/solaris/native/sun/nio/ch/NativeThread.c	2017-10-15 13:33:16.286219470 +0200
+@@ -32,9 +32,17 @@
+ #include "sun_nio_ch_NativeThread.h"
+ #include "nio_util.h"
+ 
++#if !defined (__SIGRTMAX)
++#define __SIGRTMAX (NSIG-1)
++#endif
++
+ #ifdef __linux__
+   #include <pthread.h>
+-  #include <sys/signal.h>
++#if defined (__GLIBC__)
++ #include <sys/signal.h>
++#else
++ #include <signal.h>
++#endif
+   /* Also defined in net/linux_close.c */
+   #define INTERRUPT_SIGNAL (__SIGRTMAX - 2)
+ #elif __solaris__
+--- net_util_md.h	2017-10-15 13:37:54.040226322 +0200
++++ src/solaris/native/java/net/net_util_md.h	2017-10-15 13:38:29.559227198 +0200
+@@ -33,7 +33,11 @@
+ #include <unistd.h>
+ 
+ #ifndef USE_SELECT
++#if defined (__GLIBC__)
+ #include <sys/poll.h>
++#else
++#include <poll.h>
++#endif
+ #endif
+ 
+ 
+--- jvm_md.h	2017-10-15 13:39:23.820228536 +0200
++++ src/solaris/javavm/export/jvm_md.h	2017-10-15 13:40:06.453229588 +0200
+@@ -65,7 +65,11 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#if defined (__GLIBC__)
+ #include <sys/signal.h>
++#else
++#include <signal.h>
++#endif
+ 
+ /* O Flags */
+ 

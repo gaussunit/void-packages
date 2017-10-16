@@ -12,7 +12,7 @@ _openjdk_version="openjdk-1.8.0_${_jdk_update}"
 
 pkgname=openjdk
 version="${_java_ver}u${_jdk_update}b${_jdk_build}"
-revision=1
+revision=2
 _repo_ver="jdk${version/b/-b}"
 nocross=yes
 nopie=yes
@@ -28,10 +28,10 @@ configure_args="
  $(vopt_if oracle_bootstrap --with-boot-jdk=/usr/lib/jvm/oracle-jdk \
 			    --with-boot-jdk=/usr/lib/jvm/openjdk)"
 make_build_args="DEBUG_BINARIES=true docs all"
-hostmakedepends="pkg-config cpio unzip zip ca-certificates libressl"
+hostmakedepends="pkg-config cpio unzip zip ca-certificates libressl autoconf"
 case "$XBPS_MACHINE" in
 	arm*) hostmakedepends+=" $(vopt_if oracle_bootstrap oracle-jdk-arm openjdk)";;
-	*) hostmakedepends+=" $(vopt_if oracle_bootstrap oracle-jdk openjdk)";;
+	*) hostmakedepends+=" $(vopt_if oracle_bootstrap oracle-jdk $(vopt_if alpine_bootstrap alpine-openjdk openjdk))";;
 esac
 makedepends="libXrender-devel libXtst-devel libXt-devel
  libjpeg-turbo-devel cups-devel freetype-devel alsa-lib-devel"
@@ -68,9 +68,15 @@ checksum="e5719264ea5370815c233bb8f055eacef4e4aaaef971fb84f731926ce9bc20f6
 # Build is still parallel, but don't use -jN.
 disable_parallel_build=yes
 
-build_options="oracle_bootstrap"
+build_options="oracle_bootstrap alpine_bootstrap"
 build_options_default="oracle_bootstrap"
 desc_option_oracle_bootstrap="Bootstrap using Oracle JDK"
+vopt_conflict oracle_bootstrap alpine_bootstrap
+
+case $XBPS_TARGET_MACHINE in
+	*-musl) build_options_default="alpine_bootstrap";;
+esac
+
 
 alternatives="
  java:/usr/bin/java:/usr/lib/jvm/openjdk/bin/java
@@ -156,8 +162,20 @@ post_extract() {
 	# https://bugs.openjdk.java.net/browse/JDK-8041658
 	patch -p1 < ${FILESDIR}/002_gcc.make-4.9.patch
 	# patch supported os versions to include 4 and 4.1
+	patch -Np0 < ${FILESDIR}/01-hotspot-musl.patch
+	patch -Np0 < ${FILESDIR}/02-hotspot-noagent-musl.patch
+	cd ${wrksrc}/jdk
+	patch -Np0 < ${FILESDIR}/jdk-execinfo-musl.patch
+	patch -Np0 < ${FILESDIR}/jdk-musl.patch
 	sed -i ${wrksrc}/hotspot/make/linux/Makefile \
 		-e "/SUPPORTED_OS_VERSION =/s;\(.*\);\1 4% 4.1%;"
+}
+
+pre_configure() {
+	cd ${wrksrc}/common/autoconf
+	chmod +x autogen.sh
+	./autogen.sh
+	cd ${wrksrc}
 }
 
 do_build() {

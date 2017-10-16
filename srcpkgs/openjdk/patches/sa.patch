@@ -1,0 +1,11 @@
+--- jdk-options.m4	2017-10-15 11:39:19.049050796 +0200
++++ common/autoconf/jdk-options.m4	2017-10-15 11:39:50.609051575 +0200
+@@ -151,7 +151,7 @@
+   AC_SUBST(JVM_VARIANT_ZEROSHARK)
+   AC_SUBST(JVM_VARIANT_CORE)
+ 
+-  INCLUDE_SA=true
++  AC_CHECK_HEADER(thread_db.h,INCLUDE_SA=true,INCLUDE_SA=false)
+   if test "x$JVM_VARIANT_ZERO" = xtrue ; then
+     INCLUDE_SA=false
+   fi
