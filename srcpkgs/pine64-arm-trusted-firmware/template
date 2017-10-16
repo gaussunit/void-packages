@@ -1,0 +1,22 @@
+# Template file for 'pine64-arm-trusted-firmware'
+pkgname=pine64-arm-trusted-firmware
+version=1.0
+_githash=aa75c8da415158a94b82a430b2b40000778e851f
+revision=1
+wrksrc="arm-trusted-firmware-${_githash}"
+only_for_archs="aarch64 aarch64-musl"
+build_style=gnu-makefile
+make_build_args="PLAT=sun50iw1p1 DEBUG=0 bl31"
+hostmakedepends=""
+makedepends=""
+depends=""
+short_desc="ARM Trusted Firmware"
+maintainer="John <johnz@posteo.net>"
+license="BSD-3"
+homepage="https://github.com/apritzel/arm-trusted-firmware"
+distfiles="https://github.com/apritzel/arm-trusted-firmware/archive/${_githash}.tar.gz"
+checksum=61546d43fba5c5f4e9a40fb21e6fc3ab5ee00fa6e5c583e29b4dd1cd0c00f253
+
+post_install() {
+	vinstall license.md
+}
