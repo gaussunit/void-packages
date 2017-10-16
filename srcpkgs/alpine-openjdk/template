@@ -1,0 +1,47 @@
+# Template file for 'alpine-openjdk'
+pkgname=alpine-openjdk
+version=8.144
+revision=1
+build_style=fetch
+hostmakedepends="patchelf"
+short_desc="openjdk"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="alpinelinux.org"
+distfiles="https://nl.alpinelinux.org/alpine/edge/community/x86_64/openjdk8-${version}.01-r0.apk
+ https://nl.alpinelinux.org/alpine/edge/community/x86_64/openjdk8-jre-${version}.01-r0.apk
+ https://nl.alpinelinux.org/alpine/edge/community/x86_64/openjdk8-jre-base-${version}.01-r0.apk
+ https://nl.alpinelinux.org/alpine/edge/community/x86_64/openjdk8-jre-lib-${version}.01-r0.apk
+ https://nl.alpinelinux.org/alpine/edge/main/x86_64/lksctp-tools-1.0.17-r0.apk"
+checksum="a724a313adcc8c31762ea0c998f28f374402d3ad64c6e91ac3729f31541bc6ac
+ bfee050c234b72c6df45fb8ea6684e254df9f955891bb41a571046c9bd619df5
+ fc0be9bace792688b666ad508d813db96e3a8cc29a6c005616bbddfa37f522f6
+ cac8477dcab82636f9e1b36885fcb12685addbb2f51252e08096ab48f8b885ed
+ 87fd9a53eb4fa57ca53a173bcb68b28c46ba1a8d60fea6a5968a20c7be20d743"
+
+nostrip=yes
+
+do_extract() {
+	if [[ ! -d $wrksrc ]]; then
+		mkdir -p $wrksrc
+	fi
+	for i in ${XBPS_SRCDISTDIR}/${pkgname}-${version}/*.apk ; do
+		tar xvf $i --warning=no-unknown-keyword -C ${wrksrc};
+	done
+}
+
+do_build() {
+	for i in $(find usr/ -type f);do
+		case "$(file -bi "$i")" in
+			application/x-sharedlib* | application/x-executable*)
+				patchelf --replace-needed libc.musl-x86_64.so.1 \
+					libc.so $i
+		esac;
+	done
+}
+
+do_install() {
+	ln -s /usr/lib/jvm/java-1.8-openjdk usr/lib/jvm/openjdk
+	mv usr ${DESTDIR}
+	
+}
