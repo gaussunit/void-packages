@@ -1,0 +1,31 @@
+# Template file for 'pine64-uboot-mainline'
+#
+pkgname=pine64-uboot
+version="2017.09"
+revision=1
+wrksrc="u-boot-${version}"
+hostmakedepends="bc dtc"
+short_desc="Pine64 U-Boot loader"
+maintainer="JohnZ <johnz@posteo.net>"
+license="GPL-2"
+homepage="http://www.denx.de/wiki/U-Boot/WebHome"
+distfiles="ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2"
+checksum=b2d15f2cf5f72e706025cde73d67247c6da8cd35f7e10891eefe7d9095089744
+
+only_for_archs="aarch64 aarch64-musl"
+
+do_build() {
+	unset CFLAGS CXXFLAGS LDFLAGS
+
+	if [ "$CROSS_BUILD" ]; then
+		make ARCH=arm CROSS_COMPILE=${XBPS_CROSS_TRIPLET}- pine64_plus_config
+		make CROSS_COMPILE=${XBPS_CROSS_TRIPLET}- ${makejobs}
+	else
+		make sun50iw1p1_config
+		make ${makejobs}
+	fi
+}
+do_install() {
+	vinstall MLO 644 boot
+	vinstall u-boot.img 644 boot
+}
