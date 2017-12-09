@@ -1,0 +1,22 @@
+# Template file for 'linphoneqt'
+pkgname=linphoneqt
+version=4.1.1
+revision=1
+build_style=cmake
+makedepends="linphone-devel mediastreamer-devel belle-sip-devel belcard-devel qt5-devel
+ qt5-declarative-devel qt5-quickcontrols2-devel qt5-svg-devel qt5-tools-devel
+ bctoolbox-devel"
+depends="qt5>=5.9_1 qt5-quickcontrols qt5-quickcontrols2 qt5-graphicaleffects"
+short_desc="Linphone qt desktop"
+maintainer="John <johnz@posteo.net>"
+license="GPL-2"
+homepage="https://www.linphone.org/"
+distfiles="https://www.linphone.org/releases/sources/${pkgname}/${pkgname}-${version}.tar.gz"
+checksum=4a00c0cc2861089f8d3a1d0af1cde8ad4094f23640fb6df483e1814853ce5fbc
+replaces="linphone-gui>=0"
+
+broken="needs qt5.9 or newer"
+
+if [ "$CROSS_BUILD" ];then
+	hostmakedepends+=" qt5-host-tools qt5-qmake"
+fi
