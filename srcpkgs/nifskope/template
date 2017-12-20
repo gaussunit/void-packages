@@ -1,12 +1,14 @@
 # Template file for 'nifskope'
 pkgname=nifskope
-version=2.0.dev6
+version=2.0.dev7
 revision=1
 _qhull_commit=9f0abe778c8ae80951f14066dfc86e4d6d391177
-_docsys_commit=0ffd95a50c277e761ab664b68a827502d163c083
-_nifxml_commit=959cb9c3dd59a319e60e819fc8a1402f821f3684
-_kfmxml_commit=9d12e2faf0984b469e1bd4ddaaf3ea4bdcf60101
+_gli_commit=8e43030b3e12bb58a4663d85adc5c752f89099c0
+_docsys_commit=07dc05fe2c09ac8f1defd4e94c90fe60202cb191
+_nifxml_commit=7e3677e97b8c7a41516ad3f03286d8737da96261
+_kfmxml_commit=91eff92daf197f0c5376740ed4b000d064138ec2
 build_style=qmake
+configure_args="CONFIG-=zlib"
 hostmakedepends="qt5-qmake"
 makedepends="qt5-devel glu-devel zlib-devel"
 short_desc="Tool for opening and editing the NetImmerse file format"
@@ -15,14 +17,16 @@ license="BSD"
 homepage="http://www.niftools.org"
 distfiles="https://github.com/niftools/nifskope/archive/v${version}.tar.gz
  https://github.com/qhull/qhull/archive/${_qhull_commit}.tar.gz
+ https://github.com/g-truc/gli/archive/${_gli_commit}.tar.gz
  https://github.com/niftools/nifdocsys/archive/${_docsys_commit}.tar.gz
  https://github.com/niftools/nifxml/archive/${_nifxml_commit}.tar.gz
  https://github.com/niftools/kfmxml/archive/${_kfmxml_commit}.tar.gz"
-checksum="666ad7f5a4642af39fd9315a99503879fb9739f149e36a628578dc2a285fb107
+checksum="06c4d6104fb0bf95e2ae6f0f4964223a453387742deb0e144bdc121ce44d161b
  e429bfe46dea4ef5aed8a552731183403c4e1195b3c5331a511db679259d8046
- 789c25d8784645b4d1ee8da9a8a551dd3497d08f94dadb884c61bc975e87f834
- fc36eaae14644266c55323883c66959c5063dc652d0f0552da8670382a9d1d2c
- 84e6315d0428282b4dafbc233f037af2c24cfe00a8ae973aa2da4175d52bdeaf"
+ bc7bbefe109a3e237a8d1320e87277634bddea4f4796b814be16880f629958fa
+ 935e4619b6448ecd80850f44353b8080f995fc2b722bfa2283218d51fe49bad6
+ e93f4b6c14add7a854e06208bbf74f8a5a83a1008e6271625ec9713e58a18a63
+ ffd60b2ee88b3d3c9b625b3c5ddc943e52942505201a1af35b6a04d3e76eeffb"
 
 if [ -n "$CROSS_BUILD" ]; then
 	hostmakedepends+=" qt5-host-tools"
@@ -35,6 +39,7 @@ esac
 
 post_extract() {
 	mv -T ../qhull-${_qhull_commit} ${wrksrc}/lib/qhull
+	mv -T ../gli-${_gli_commit} ${wrksrc}/lib/gli
 	mv -T ../nifdocsys-${_docsys_commit} ${wrksrc}/build/docsys
 	mv -T ../nifxml-${_nifxml_commit} ${wrksrc}/build/docsys/nifxml
 	mv -T ../kfmxml-${_kfmxml_commit} ${wrksrc}/build/docsys/kfmxml
@@ -42,8 +47,7 @@ post_extract() {
 
 do_install() {
 	vbin release/NifSkope
-	vlicense release/Qhull_COPYING.txt
-	vlicense LICENSE.md
+	vlicense release/LICENSE.txt
 
 	mv res ${DESTDIR}/usr/share/nifskope
 
