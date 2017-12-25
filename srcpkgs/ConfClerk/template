@@ -1,0 +1,18 @@
+# Template file for 'ConfClerk'
+pkgname=ConfClerk
+version=0.6.4
+revision=1
+wrksrc="confclerk-${version}"
+build_style=qmake
+makedepends="qt5-devel"
+short_desc="Offline viewer for conference schedules"
+maintainer="John <johnz@posteo.net>"
+license="GPL-2"
+homepage="http://www.toastfreeware.priv.at/confclerk"
+distfiles="http://www.toastfreeware.priv.at/tarballs/confclerk/confclerk-${version}.tar.gz"
+checksum=6389fc74fd6827d59aa26f6792919583e8266e65818c3bda5cdb927e09793083
+
+nocross=yes #Doesn't find the qt5 headers
+if [ "$CROSS_BUILD" ]; then
+	hostmakedepends="qt5-devel"
+fi
