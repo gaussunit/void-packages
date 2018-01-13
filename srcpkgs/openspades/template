@@ -1,0 +1,19 @@
+# Template file for 'openspades'
+pkgname=openspades
+version=0.1.2
+revision=1
+build_style=cmake
+configure_args="-DOPENSPADES_INSTALL_BINARY=bin"
+hostmakedepends="pkg-config wget unzip zip"
+makedepends="glew-devel libcurl-devel SDL2-devel SDL2_image-devel
+ freealut-devel freetype-devel opus-devel opusfile-devel"
+depends="xdg-utils"
+short_desc="Ace of Spades"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="http://openspades.yvt.jp/"
+distfiles="https://github.com/yvt/openspades/archive/v${version}.tar.gz"
+checksum=f4947232eded073469d07935783786efd70e7d73e615326dbb66676c4e8724a8
+repository=nonfree
+restricted=yes
+nocross="Anglescript doesn't use target Arch"
