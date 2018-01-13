@@ -1,0 +1,89 @@
+diff --git meson.build meson.build
+new file mode 100644
+index 0000000..0d77d72
+--- /dev/null
++++ meson.build
+@@ -0,0 +1,83 @@
++project('goxel', 'c', 'cpp',
++	version : '0.7.2',
++	license : 'GPLv3',
++	default_options : ['c_std=gnu99', 'cpp_std=gnu++11'])
++
++gtk_dep = dependency('gtk+-3.0')
++glfw_dep = dependency('glfw3')
++
++compiler = meson.get_compiler('c')
++
++if not meson.get_compiler('c').has_header_symbol('features.h', '__GLIBC__')
++	add_global_link_arguments('-largp', language : ['cpp', 'c'])
++endif
++
++sources = ['src/action.c',
++'src/assets.c',
++'src/cache.c',
++'src/camera.c',
++'src/color.c',
++'src/gesture.c',
++'src/gesture3d.c',
++'src/goxel.c',
++'src/gui_settings.c',
++'src/image.c',
++'src/main.c',
++'src/marchingcube.c',
++'src/mesh.c',
++'src/mesh_to_vertices.c',
++'src/mesh_utils.c',
++'src/model3d.c',
++'src/mustache.c',
++'src/palette.c',
++'src/procedural.c',
++'src/quantization.c',
++'src/render.c',
++'src/shape.c',
++'src/sound.c',
++'src/stack.c',
++'src/system.c',
++'src/texture.c',
++'src/theme.c',
++'src/tools.c',
++'src/utils.c',
++'src/vec.c',
++'src/gui.cpp',
++'src/formats/dicom.c',
++'src/formats/gox.c',
++'src/formats/png.c',
++'src/formats/png_slices.c',
++'src/formats/povray.c',
++'src/formats/qubicle.c',
++'src/formats/txt.c',
++'src/formats/vox.c',
++'src/formats/voxlap.c',
++'src/formats/vxl.c',
++'src/formats/wavefront.c',
++'src/tools/brush.c',
++'src/tools/color_picker.c',
++'src/tools/extrude.c',
++'src/tools/laser.c',
++'src/tools/move.c',
++'src/tools/plane.c',
++'src/tools/procedural.c',
++'src/tools/selection.c',
++'src/tools/shape.c',
++'ext_src/imgui/imgui.cpp',
++'ext_src/imgui/imgui_draw.cpp',
++'ext_src/inih/ini.c']
++
++incdir = include_directories(['src',
++	'ext_src/uthash',
++	'ext_src/noc',
++	'ext_src/stb',
++	'ext_src/inih',
++	'ext_src/imgui'])
++
++executable('goxel', sources,
++	dependencies : [gtk_dep, glfw_dep],
++	link_args : ['-lGL', '-lm', '-lz'],
++	cpp_args : '-DIMGUI_INCLUDE_IMGUI_USER_INL',
++	c_args : '-DINI_HANDLER_LINENO=1',
++	include_directories : incdir,
++	install : true)

@@ -2,9 +2,8 @@
 pkgname=goxel
 version=0.7.2
 revision=1
-build_style=scons
-make_build_args="debug=0 werror=0"
-hostmakedepends="pkg-config scons"
+build_style=meson
+hostmakedepends="pkg-config"
 makedepends="glfw-devel gtk+3-devel"
 short_desc="Open Source 3D voxel editor"
 maintainer="cr6git <quark6@protonmail.com>"
@@ -16,10 +15,3 @@ checksum=62e34cea01ace1c104e86ff3bfb758d610636f44808b89d31f9d18821a673253
 case "$XBPS_TARGET_MACHINE" in
 	*-musl) makedepends+=" argp-standalone";;
 esac
-
-# For now cross-compilation fails
-nocross=yes
-
-do_install() {
-	vbin goxel
-}
