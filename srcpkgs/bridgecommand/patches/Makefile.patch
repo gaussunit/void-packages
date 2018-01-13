@@ -1,0 +1,75 @@
+--- Makefile.bak	2018-01-13 14:30:36.175118210 +0100
++++ Makefile	2018-01-13 14:31:32.935425037 +0100
+@@ -32,9 +32,9 @@
+ #no changes necessary below this line
+ ####
+ 
+-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+-CXXFLAGS = $(USERCXXFLAGS)
+-LDFLAGS = $(USERLDFLAGS)
++override CPPFLAGS += -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
++override CXXFLAGS += $(USERCXXFLAGS)
++override LDFLAGS += $(USERLDFLAGS)
+ 
+ # name of the binary - only valid for targets which set SYSTEM
+ DESTPATH = $(BinPath)/$(Target)$(SUF)
+--- controller/Makefile.bak	2018-01-13 15:16:07.734711265 +0100
++++ controller/Makefile	2018-01-13 15:16:34.063743319 +0100
+@@ -32,9 +32,9 @@
+ #no changes necessary below this line
+ ####
+ 
+-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+-CXXFLAGS = $(USERCXXFLAGS)
+-LDFLAGS = $(USERLDFLAGS)
++override CPPFLAGS += -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
++override CXXFLAGS += $(USERCXXFLAGS)
++override LDFLAGS += $(USERLDFLAGS)
+ 
+ # name of the binary - only valid for targets which set SYSTEM
+ DESTPATH = $(BinPath)/$(Target)$(SUF)
+--- editor/Makefile.bak	2018-01-13 15:17:13.147790902 +0100
++++ editor/Makefile	2018-01-13 15:17:44.480829047 +0100
+@@ -32,9 +32,9 @@
+ #no changes necessary below this line
+ ####
+ 
+-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+-CXXFLAGS = $(USERCXXFLAGS)
+-LDFLAGS = $(USERLDFLAGS)
++override CPPFLAGS += -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
++override CXXFLAGS += $(USERCXXFLAGS)
++override LDFLAGS += $(USERLDFLAGS)
+ 
+ # name of the binary - only valid for targets which set SYSTEM
+ DESTPATH = $(BinPath)/$(Target)$(SUF)
+--- iniEditor/Makefile.bak	2018-01-13 15:18:23.309876322 +0100
++++ iniEditor/Makefile	2018-01-13 15:18:49.401908088 +0100
+@@ -33,9 +33,9 @@
+ #no changes necessary below this line
+ ####
+ 
+-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+-CXXFLAGS = $(USERCXXFLAGS)
+-LDFLAGS = $(USERLDFLAGS)
++override CPPFLAGS += -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
++override CXXFLAGS += $(USERCXXFLAGS)
++override LDFLAGS += $(USERLDFLAGS)
+ 
+ # name of the binary - only valid for targets which set SYSTEM
+ DESTPATH = $(BinPath)/$(Target)$(SUF)
+--- launcher/Makefile.bak	2018-01-13 15:19:25.615952177 +0100
++++ launcher/Makefile	2018-01-13 15:20:28.497028919 +0100
+@@ -33,9 +33,9 @@
+ #no changes necessary below this line
+ ####
+ 
+-CPPFLAGS = -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
+-CXXFLAGS = $(USERCXXFLAGS)
+-LDFLAGS = $(USERLDFLAGS)
++override CPPFLAGS += -I$(IrrlichtHome)/include -I/usr/X11R6/include $(USERCPPFLAGS)
++override CXXFLAGS += $(USERCXXFLAGS)
++override LDFLAGS += $(USERLDFLAGS)
+ 
+ # name of the binary - only valid for targets which set SYSTEM
+ DESTPATH = $(BinPath)/$(Target)$(SUF)

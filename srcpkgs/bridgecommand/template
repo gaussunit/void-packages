@@ -1,0 +1,65 @@
+# Template file for 'bridgecommand'
+pkgname=bridgecommand
+version=5.0
+revision=1
+wrksrc="bc-${version}"
+build_style=gnu-makefile
+hostmakedepends="pkg-config unzip"
+makedepends="libjpeg-turbo-devel libpng-devel libXcursor-devel libXext-devel MesaLib-devel"
+short_desc="Interactive ship simulator program"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://www.bridgecommand.co.uk/"
+distfiles="https://github.com/bridgecommand/bc/archive/v${version}.tar.gz"
+checksum=a16417839b8e3b5dda51c4a64ae3130ab2147cf8eec66423aaaedda9101423ae
+repository=nonfree
+CPPFLAGS="-DPNG_ARM_NEON_OPT=0"
+
+case $XBPS_TARGET_MACHINE in
+	*-musl) broken="locale";;
+esac
+
+gnu-make() {
+	: ${make_cmd:=make}
+
+	${make_cmd} \
+		CC="$CC" CXX="$CXX" LD="$LD" AR="$AR" RANLIB="$RANLIB" \
+		CPP="$CPP" AS="$AS" OBJDUMP="$OBJDUMP" \
+		CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
+		${makejobs} ${make_build_args} ${make_build_target}
+}
+
+do_build() {
+	echo Building Irrlicht
+	cd ${wrksrc}/libs/Irrlicht/irrlicht-svn/source/Irrlicht
+	gnu-make
+	echo Building bc
+	cd ${wrksrc}
+	gnu-make
+	echo Building controller
+	cd ${wrksrc}/controller
+	gnu-make
+	echo Building editor
+	cd ${wrksrc}/editor
+	gnu-make
+	echo Building iniEditor
+	cd ${wrksrc}/iniEditor
+	gnu-make
+	echo Building launcher
+	cd ${wrksrc}/launcher
+	gnu-make
+}
+
+do_install() {
+	vmkdir opt/bridgecommand
+	for i in bridgecommand{,-bc,-ed,-ini,-mc}; do
+		vinstall ${i} 755 opt/bridgecommand/
+	done
+
+	for i in Models Scenarios World doc media shaders; do
+		vcopy ${i} opt/bridgecommand/${i}
+	done
+
+	vcopy *.txt opt/bridgecommand/
+	vcopy *.ini opt/bridgecommand/
+}

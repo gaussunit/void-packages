@@ -1,0 +1,17 @@
+--- unix.c	2018-01-13 13:07:47.982014592 +0100
++++ libs/enet/unix.c	2018-01-13 13:08:43.519298761 +0100
+@@ -51,12 +51,14 @@
+ //#ifndef HAS_SOCKLEN_T
+ //typedef int socklen_t;
+ //#endif
++#ifndef __DEFINED_socklen_t
+ #ifndef __APPLE__ //Added for Mac OS compilation
+ #ifndef __socklen_t_defined
+ typedef int socklen_t;
+ #define __socklen_t_defined
+ #endif
+ #endif
++#endif
+ 
+ #ifndef MSG_NOSIGNAL
+ #define MSG_NOSIGNAL 0
