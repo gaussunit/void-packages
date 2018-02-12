@@ -1,0 +1,31 @@
+# Template file for 'marble'
+pkgname=marble
+version=17.12.2
+revision=1
+maintainer="Piotr Wójcik <chocimier@tlen.pl>"
+homepage="https://marble.kde.org"
+license="GPL-3"
+short_desc="Virtual globe and world atlas"
+build_style=cmake
+hostmakedepends="extra-cmake-modules"
+makedepends="knewstuff-devel kparts-devel krunner-devel libressl-devel
+phonon-devel plasma-framework-devel qt5-devel qt5-location-devel
+qt5-plugin-mysql qt5-plugin-odbc qt5-plugin-pgsql qt5-plugin-sqlite
+qt5-plugin-tds qt5-serialport-devel qt5-webkit-devel"
+distfiles="http://download.kde.org/stable/applications/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=5e9e2e98fb0205cd54316eda5ddd31741145985e8ddff4fe434dbc700a5cdcf8
+
+if [ -n "$CROSS_BUILD" ]; then
+	hostmakedepends+=" kdoctools qt5-host-tools qt5-qmake"
+fi
+
+marble-devel_package() {
+	short_desc+=" - development files"
+	depends="${makedepends} ${sourcepkg}>=${version}_${revision}"
+	conflicts="marble-devel"
+	pkg_install() {
+		vmove usr/include
+		vmove "usr/lib/*.so"
+		vmove usr/lib/cmake
+	}
+}
