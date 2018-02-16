@@ -1,0 +1,15 @@
+# Template file for 'deepin-menu'
+pkgname=deepin-menu
+version=3.2.0
+revision=1
+build_style=qmake
+hostmakedepends="qt5-qmake pkg-config"
+makedepends="dtkwidget-devel qt5-declarative-devel dde-qt-dbus-factory-devel
+ qt5-x11extras-devel"
+depends="python"
+short_desc="Unified menu service for Deepin Desktop Environment"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/linuxdeepin/deepin-menu/"
+distfiles="https://github.com/linuxdeepin/deepin-menu/archive/${version}.tar.gz"
+checksum=14bb86c43e82b85a803677d9305635f2c1bc03e930c74b7ae2692cddd5e84d85
