@@ -3099,3 +3099,5 @@ libgnuradio-audio-3.7.12git.so.0.0.0 gnuradio-3.7.12git_1
 libgnuradio-noaa-3.7.12git.so.0.0.0 gnuradio-3.7.12git_1
 libgsettings-qt.so.1 gsettings-qt-0.1.20160329_1
 libdtkcore.so.2 dtkcore-2.0.6_1
+libdtksettings.so.1 dtksettings-0.1.7_1
+libdtksettingsview.so.1 dtksettings-0.1.7_1
