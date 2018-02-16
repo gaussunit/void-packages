@@ -3101,3 +3101,4 @@ libgsettings-qt.so.1 gsettings-qt-0.1.20160329_1
 libdtkcore.so.2 dtkcore-2.0.6_1
 libdtksettings.so.1 dtksettings-0.1.7_1
 libdtksettingsview.so.1 dtksettings-0.1.7_1
+libdframeworkdbus.so.1 dde-qt-dbus-factory-0.4.2_1
