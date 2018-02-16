@@ -3102,3 +3102,4 @@ libdtkcore.so.2 dtkcore-2.0.6_1
 libdtksettings.so.1 dtksettings-0.1.7_1
 libdtksettingsview.so.1 dtksettings-0.1.7_1
 libdframeworkdbus.so.1 dde-qt-dbus-factory-0.4.2_1
+libdtkwidget.so.2 dtkwidget-2.0.6.1_1
