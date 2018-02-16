@@ -1,0 +1,16 @@
+# Template file for 'deepin-movie-reborn'
+pkgname=deepin-movie-reborn
+version=3.2.0.3
+revision=1
+build_style=cmake
+hostmakedepends="pkg-config"
+makedepends="ffmpeg-devel ffmpegthumbnailer-devel mpv-devel qt5-svg-devel
+ dtkwidget-devel qt5-declarative-devel qt5-x11extras-devel qt5-tools-devel
+ xcb-proto xcb-util-wm-devel xcb-util-devel pulseaudio-devel libdvdnav-devel 
+ qt5-plugin-mysql qt5-plugin-sqlite qt5-plugin-odbc qt5-plugin-pgsql qt5-plugin-tds"
+short_desc="Deepin Movie Player"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/linuxdeepin/deepin-movie-reborn"
+distfiles="https://github.com/linuxdeepin/deepin-movie-reborn/archive/${version}.tar.gz"
+checksum=c6721697eb022a8da03e4f4bc2aa4573695d8b9b0c0511edf17cecf9429200d9
