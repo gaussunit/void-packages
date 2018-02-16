@@ -1,0 +1,24 @@
+# Template file for 'dtkwm'
+pkgname=dtkwm
+version=2.0.6
+revision=1
+build_style=qmake
+hostmakedepends="qt5-qmake pkg-config"
+makedepends="qt5-devel qt5-x11extras-devel qt5-multimedia-devel xcb-util-devel
+ dtkcore-devel"
+short_desc="Deepin graphical user interface library"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/linuxdeepin/dtkwm/"
+distfiles="https://github.com/linuxdeepin/dtkwm/archive/${version}.tar.gz"
+checksum=d352c458ebce3e12f1cddc3bc4176d78ad4aee682eb0bcf7f11b4e0bdf703370
+
+dtkwm-devel_package() {
+	short_desc+=" - development files"
+	depends="${sourcepkg}>=${version}_${revision}"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/*.so
+		vmove usr/lib/pkgconfig
+	}
+}
