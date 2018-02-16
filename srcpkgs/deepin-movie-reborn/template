@@ -6,7 +6,7 @@ build_style=cmake
 hostmakedepends="pkg-config"
 makedepends="ffmpeg-devel ffmpegthumbnailer-devel mpv-devel qt5-svg-devel
  dtkwidget-devel qt5-declarative-devel qt5-x11extras-devel qt5-tools-devel
- xcb-proto xcb-util-wm-devel xcb-util-devel pulseaudio-devel libdvdnav-devel 
+ xcb-proto xcb-util-wm-devel xcb-util-devel pulseaudio-devel libdvdnav-devel
  qt5-plugin-mysql qt5-plugin-sqlite qt5-plugin-odbc qt5-plugin-pgsql qt5-plugin-tds"
 short_desc="Deepin Movie Player"
 maintainer="John <johnz@posteo.net>"
