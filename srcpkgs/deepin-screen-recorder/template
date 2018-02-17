@@ -1,0 +1,15 @@
+# Template file for 'deepin-screen-recorder'
+pkgname=deepin-screen-recorder
+version=2.7.3
+revision=1
+build_style=qmake
+hostmakedepends="qt5-qmake pkg-config"
+makedepends="dtkwm-devel dtkwidget-devel qt5-x11extras-devel ffmpeg-devel
+ libXtst-devel xcb-util-devel libxcb-devel procps-ng-devel"
+depends="deepin-notifications"
+short_desc="Deepin Screencasting Application"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/linuxdeepin/deepin-screen-recorder"
+distfiles="https://github.com/linuxdeepin/deepin-screen-recorder/archive/2.7.3.tar.gz"
+checksum=a37700f4d7b2b2ce83ca853ea253b979503e3dfc4020e677ccaaab12a93dacae
