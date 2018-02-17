@@ -1,0 +1,15 @@
+# Template file for 'deepin-screenshot'
+pkgname=deepin-screenshot
+version=4.0.10.4
+revision=1
+build_style=qmake
+hostmakedepends="qt5-qmake pkg-config"
+makedepends="qt5-svg-devel xcb-util-devel dtkwidget-devel dtkwm-devel
+ qt5-x11extras-devel libXtst-devel"
+depends="deepin-notifications deepin-menu deepin-shortcut-viewer dde-daemon deepin-gettext-tools"
+short_desc="Deepin Screenshot App"
+maintainer="John <johnz@posteo.net>"
+license="GPL-3"
+homepage="https://github.com/linuxdeepin/deepin-screenshot"
+distfiles="https://github.com/linuxdeepin/deepin-screenshot/archive/${version}.tar.gz"
+checksum=81c4ff53dafd25828125c5a83806296058f0b59bd079ca2cc72fbc0c085b2f2e
