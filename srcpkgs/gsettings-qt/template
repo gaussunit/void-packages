@@ -4,7 +4,6 @@ version=0.1.20160329
 revision=1
 create_wrksrc=yes
 build_style=qmake
-disable_parallel_build=yes
 hostmakedepends="qt5-qmake pkg-config qt5-declarative"
 makedepends="qt5-devel qt5-declarative-devel glib-devel"
 short_desc="Qml bindings for GSettings"
