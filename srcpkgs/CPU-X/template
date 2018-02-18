@@ -1,0 +1,16 @@
+# Template file for 'CPU-X'
+pkgname=CPU-X
+version=3.2.0
+revision=1
+only_for_archs="i686 x86_64"
+build_style=cmake
+build_options="gtk3"
+build_options_default="gtk3"
+hostmakedepends="pkg-config nasm"
+makedepends="pciutils-devel ncurses-devel libcpuid-devel procps-ng-devel libcurl-devel $(vopt_if gtk3 'gtk+3-devel')"
+short_desc="CPU-X is software that gathers information on CPU, motherboard and more"
+maintainer="fallenwizard <fallenwiz@protonmail.com>"
+license="GPL-3"
+homepage="https://github.com/X0rg/CPU-X"
+distfiles="$homepage/archive/v$version.tar.gz"
+checksum=a88c188d51a8e9cb06f3b68c40eb8c97946f78eac70ab42ade6dc9ffd7f9bd89
