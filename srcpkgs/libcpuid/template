@@ -1,0 +1,33 @@
+# Template file for 'libcpuid'
+pkgname=libcpuid
+version=0.4.0
+revision=1
+only_for_archs="i686 x86_64 i686-musl x86_64-musl"
+build_style=gnu-configure
+hostmakedepends="autoconf libtool automake"
+short_desc="A C library for x86 CPU detection and feature extraction"
+maintainer="fallenwizard <fallenwiz@protonmail.com>"
+license="BSD-2"
+homepage="https://github.com/anrieff/libcpuid"
+distfiles="$homepage/archive/v$version.tar.gz"
+checksum=43427230cd9e86e25e5898b8e226c8af165085898795fd82d048d192c077ebfa
+
+pre_configure() {
+	libtoolize -f
+	autoreconf -fi
+}
+
+post_install() {
+	vlicense COPYING
+}
+
+libcpuid-devel_package() {
+	depends="${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/pkgconfig
+		vmove "usr/lib/*.a"
+		vmove "usr/lib/*.so"
+	}
+}
