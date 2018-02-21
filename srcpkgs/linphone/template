@@ -2,7 +2,7 @@
 pkgname=linphone
 version=3.12.0
 revision=1
-short_desc="A Voice-over-IP phone"
+short_desc="Voice-over-IP phone"
 maintainer="John <johnz@posteo.net>"
 build_style="cmake"
 configure_args="-DENABLE_STRICT=0 -DENABLE_GTK_UI=$(vopt_if gui true false)"
