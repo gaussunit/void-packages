@@ -1,6 +1,6 @@
 # Template file for 'proj'
 pkgname=proj
-version=4.9.3
+version=5.0.0
 revision=1
 build_style=gnu-configure
 short_desc="Cartographic Projections Library"
@@ -8,7 +8,7 @@ maintainer="John <johnz@posteo.net>"
 license="MIT"
 homepage="http://proj4.org"
 distfiles="http://download.osgeo.org/proj/proj-${version}.tar.gz"
-checksum=6984542fea333488de5c82eea58d699e4aff4b359200a9971537cd7e047185f7
+checksum=b30df08d736e69744cb255828721abb545b494d6032c13a96520f3219a444cd2
 
 post_install() {
 	vlicense COPYING
