@@ -1,7 +1,7 @@
 # Template file for 'subversion'
 pkgname=subversion
 version=1.9.7
-revision=1
+revision=2
 short_desc="Enterprise-class centralized version control for the masses"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 license="Apache-2.0, BSD"
@@ -13,14 +13,14 @@ hostmakedepends="pkg-config"
 makedepends="db-devel perl python-devel swig apr-util-devel
  libldap-devel serf-devel gdbm-devel expat-devel apr-devel libuuid-devel
  sqlite-devel libsasl-devel dbus-devel libgnome-keyring-devel glib-devel
- qt-devel kdelibs-devel apache-devel"
+ qt-devel apache-devel"
 depends="ca-certificates"
 nocross=yes
 
 do_configure() {
 	./configure ${configure_args} \
 		--with-apxs --disable-javahl --disable-static \
-		--with-kwallet --with-gnome-keyring --with-editor=vi \
+		--without-kwallet --with-gnome-keyring --with-editor=vi \
 		--disable-mod-activation
 }
 do_build() {
@@ -50,6 +50,7 @@ do_install() {
 	done
 
 	vsv svnserve
+	vlicense LICENSE
 }
 
 libsvn_package() {
@@ -84,13 +85,6 @@ subversion-gnome-keyring-auth_package() {
 	short_desc+=" - gnome-keyring authentication support"
 	pkg_install() {
 		vmove "usr/lib/libsvn_auth_gnome_keyring*"
-	}
-}
-subversion-kwallet-auth_package() {
-	lib32disabled=yes
-	short_desc+=" - KDE kwallet authentication support"
-	pkg_install() {
-		vmove "usr/lib/libsvn_auth_k*"
 	}
 }
 subversion-python_package() {
