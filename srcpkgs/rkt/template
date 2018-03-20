@@ -16,17 +16,22 @@ checksum=d2d89db86b4b3a586a8288ba7becdb87370d4fbe7e12aa37e9b1e30a9f9c9b20
 patch_args="-Np1"
 nopie=yes
 
+build_options="coreos"
+subpackages="$(vopt_if coreos rkt-stage1-coreos) rkt-stage1-fly"
+
+case $XBPS_TARGET_ARCH in
+	x86_64*) build_options_default="coreos";;
+esac
+
 # KVM support broken
 configure_args="--enable-tpm=no
 --enable-sdjournal=no
---with-stage1-flavors=fly,coreos,host
+--with-stage1-flavors=fly$(vopt_if coreos ',coreos'),host
 --with-stage1-default-location=/usr/lib/rkt/stage1.aci"
 
 system_groups="rkt"
 
 nocross=yes
-
-only_for_archs="x86_64 x86_64-musl"
 
 make_dirs="
 /var/lib/rkt 2750 root rkt
