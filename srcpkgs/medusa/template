@@ -1,0 +1,38 @@
+# Template file for 'medusa'
+pkgname=medusa
+version=0.0.0.20170329
+revision=1
+_commit=4d137e7f85e1e0a1f17f53aa1ac126a855559b37
+wrksrc="mgba-$_commit"
+build_style=cmake
+hostmakedepends="pkg-config"
+makedepends="libepoxy-devel ffmpeg-devel SDL2-devel MesaLib-devel zlib-devel
+ libpng-devel libzip-devel libedit-devel libmagick-devel libzip-devel
+ minizip-devel"
+short_desc="Nintendo DSand Game Boy Advance emulator"
+maintainer="John <johnz@posteo.net>"
+license="MPL-2"
+homepage="https://github.com/mgba-emu/mgba/tree/medusa"
+distfiles="https://github.com/mgba-emu/mgba/archive/${_commit}.tar.gz"
+checksum=0496258fbafc420864ae1642e1d64cea7eaee9e489c389e787a4f4af10e19ede
+
+subpackages="libmedusa"
+if [ -z "$CROSS_BUILD" ]; then
+	makedepends+=" qt5-multimedia-devel"
+	subpackages+=" medusa-qt"
+fi
+
+libmedusa_package() {
+	short_desc+=" - shared library"
+	pkg_install() {
+		vmove usr/lib/libmedusa-emu.so*
+	}
+}
+medusa-qt_package() {
+	short_desc+=" - QT frontend"
+	pkg_install() {
+		vmove usr/bin/medusa-emu-qt
+		vmove usr/share/man/man6/medusa-emu-qt.6
+	}
+}
+
