@@ -1,0 +1,18 @@
+# Template file for 'citra'
+pkgname=citra
+version=0.0.0.20170329
+revision=1
+_commit="a567a924688453cf1d10bc9a4c5c954480f05fa9"
+build_style=cmake
+configure_args="-DENABLE_WEB_SERVICE=0"
+hostmakedepends="git"
+makedepends="SDL2-devel qt5-devel"
+short_desc="Nintendo 3DS Emulator"
+maintainer="John <johnz@posteo.net>"
+license="GPL-2.0-or-later"
+homepage="https://citra-emu.org"
+nocross=yes
+
+do_fetch() {
+	git clone https://github.com/citra-emu/citra --recursive ${wrksrc}
+}

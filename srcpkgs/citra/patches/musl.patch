@@ -1,0 +1,10 @@
+--- src/core/memory.h	2018-03-29 18:15:29.906329871 +0200
++++ -	2018-03-29 18:16:48.031239050 +0200
+@@ -22,6 +22,7 @@
+  * Page size used by the ARM architecture. This is the smallest granularity with which memory can
+  * be mapped.
+  */
++#undef PAGE_SIZE
+ const u32 PAGE_SIZE = 0x1000;
+ const u32 PAGE_MASK = PAGE_SIZE - 1;
+ const int PAGE_BITS = 12;
